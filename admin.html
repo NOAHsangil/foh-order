@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2B2B2B">
+<link rel="icon" href="icon-192.png">
+<title>MG롯데평촌점 FOH 발주 · 관리자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#F3F5F2; --surface:#FFFFFF; --sunk:#E9EDE8; --sunk2:#F6F8F5; --ink:#1B2320; --muted:#66716B; --line:#D8DED9; --line2:#E7EBE7;
+  --brand:#1F4B3D; --brand-ink:#FFFFFF; --brand-soft:#E3EEE8; --accent:#C9702A; --accent-soft:#FBEBDD;
+  --danger:#B93A2B; --danger-soft:#FBE3DF; --ok:#2E7A4E; --ok-soft:#E0F1E6; --hol:#8D9490; --act:#2F5E9E; --act-soft:#E2ECF8;
+  --side:#2B2B2B; --side-ink:#E9ECEA; --side-muted:#9AA19D;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121715; --surface:#1A211E; --sunk:#232B28; --sunk2:#1E2522; --ink:#E6ECE8; --muted:#97A39C; --line:#2F3934; --line2:#27302C;
+  --brand:#7FC4A5; --brand-ink:#0E1512; --brand-soft:#1E3129; --accent:#F0A262; --accent-soft:#3A2A1C;
+  --danger:#F08A7A; --danger-soft:#3B201C; --ok:#7FD1A0; --ok-soft:#1C3326; --hol:#7A827E; --act:#8DB6EE; --act-soft:#1D2A3B;
+  --side:#0D1110; --side-ink:#E6ECE8; --side-muted:#7D8783; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121715; --surface:#1A211E; --sunk:#232B28; --sunk2:#1E2522; --ink:#E6ECE8; --muted:#97A39C; --line:#2F3934; --line2:#27302C;
+  --brand:#7FC4A5; --brand-ink:#0E1512; --brand-soft:#1E3129; --accent:#F0A262; --accent-soft:#3A2A1C;
+  --danger:#F08A7A; --danger-soft:#3B201C; --ok:#7FD1A0; --ok-soft:#1C3326; --hol:#7A827E; --act:#8DB6EE; --act-soft:#1D2A3B;
+  --side:#0D1110; --side-ink:#E6ECE8; --side-muted:#7D8783; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+aside{background:var(--side);color:var(--side-ink);padding:18px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+.logo{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.logo i{width:38px;height:38px;border-radius:9px;background:#3a3a3a;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:11px;line-height:1.05;text-align:center}
+.logo b{display:block;font-size:14px}.logo small{color:var(--side-muted);font-size:12px}
+nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;color:var(--side-ink);padding:10px 12px;border-radius:8px;cursor:pointer;font-size:14px}
+nav button:hover{background:rgba(255,255,255,.07)}
+nav button[aria-current="page"]{background:rgba(255,255,255,.13);font-weight:700}
+nav button .dot{width:7px;height:7px;border-radius:50%;background:var(--side-muted)}
+nav button[aria-current="page"] .dot{background:#7FC4A5}
+nav button small{margin-left:auto;color:var(--side-muted);font-size:11px}
+aside .foot{margin-top:auto;font-size:12px;color:var(--side-muted);padding:8px}
+aside .foot a{color:var(--side-ink)}
+main{padding:22px 28px 60px;min-width:0}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.top h1{font-size:20px;margin:0 8px 0 0}
+.wk{display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
+.wk button{border:0;background:none;padding:6px 10px;border-radius:7px;cursor:pointer}
+.wk button:hover{background:var(--sunk)}
+.wk b{min-width:150px;text-align:center}
+.btn{border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.btn.sm{padding:4px 9px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:default}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.spacer{flex:1}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+.card h2{font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.card h2 .sub{font-weight:400}
+.sub{color:var(--muted);font-size:12.5px}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+@media (max-width:1300px){.g2{grid-template-columns:1fr}}
+.kpi{padding:14px 16px}
+.kpi .l{color:var(--muted);font-size:12.5px}
+.kpi .v{font-size:24px;font-weight:700;margin-top:4px}
+.kpi .s{font-size:12.5px;margin-top:2px}
+.up{color:var(--danger)}.down{color:var(--ok)}
+table{border-collapse:separate;border-spacing:0;width:100%}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line2);text-align:left;vertical-align:middle}
+th{font-size:12px;color:var(--muted);font-weight:500;background:var(--sunk2);position:sticky;top:0;z-index:2;white-space:nowrap}
+td b{white-space:nowrap}
+td.r,th.r{text-align:right}
+tr.grp td{background:var(--sunk);font-weight:700;font-size:13px}
+.bar{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;min-width:80px}
+.bar i{display:block;height:100%;border-radius:99px}
+.pill{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:99px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.bad{background:var(--danger-soft);color:var(--danger)}
+.pill.act{background:var(--act-soft);color:var(--act)}.pill.warn{background:var(--accent-soft);color:var(--accent)}
+.todo li{margin:6px 0}
+.todo{padding-left:18px;margin:0}
+.empty{color:var(--muted);padding:24px;text-align:center}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+/* weekly grid */
+.gwrap{overflow:auto;max-height:calc(100vh - 170px);border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.gt{font-size:13px;width:max-content;min-width:100%}
+.gt th,.gt td{padding:0;border-bottom:1px solid var(--line2);border-right:1px solid var(--line2)}
+.gt thead th{text-align:center;padding:5px 4px}
+.gt thead tr:nth-child(2) th{top:29px}
+.gt .stick{position:sticky;left:0;z-index:3;background:var(--surface)}
+.gt thead .stick{z-index:4;background:var(--sunk2)}
+.gt td.name{padding:3px 10px;min-width:230px;max-width:260px;line-height:1.3}
+.gt td.name b{font-weight:500;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gt td.name small{color:var(--muted);font-size:11.5px}
+.gt td.c{width:52px;min-width:52px;text-align:right;padding:4px 6px}
+.gt td.c.fc{color:var(--muted)}
+.gt td.c.rec{color:var(--accent);font-weight:600}
+.gt td.c.rec.z{color:var(--muted);font-weight:400;opacity:.6}
+.gt td.in{width:56px;min-width:56px;padding:0}
+.gt td.in input{width:100%;border:0;background:transparent;text-align:right;padding:6px 6px;font-family:var(--f-num);font-size:13px;outline:none}
+.gt td.in input:focus{background:var(--brand-soft);box-shadow:inset 0 0 0 2px var(--brand)}
+.gt td.in.st input{background:color-mix(in srgb,var(--sunk2) 70%,transparent)}
+.gt td.in input.set{font-weight:600}
+.gt td.act{background:var(--act-soft);color:var(--act);font-weight:600;text-align:right;padding:4px 6px;font-family:var(--f-num)}
+.gt td.off{background:repeating-linear-gradient(45deg,var(--sunk2),var(--sunk2) 4px,var(--surface) 4px,var(--surface) 8px)}
+.gt td.hol{background:var(--sunk);color:var(--hol);text-align:center;font-size:11.5px}
+.gt tr.grp td{background:var(--sunk);padding:7px 10px;font-weight:700;position:sticky}
+.gt tr.vsum td{background:var(--sunk2);font-size:12px;color:var(--muted);text-align:right;padding:5px 6px}
+.gt .dsep{border-left:2px solid var(--line)}
+.gt td.today, .gt th.today{background:color-mix(in srgb,var(--accent-soft) 60%,transparent)}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.search{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;min-width:220px}
+/* upload */
+.drop{display:block;border:2px dashed var(--line);border-radius:14px;padding:34px;text-align:center;background:var(--surface);cursor:pointer}
+.drop.over{border-color:var(--brand);background:var(--brand-soft)}
+.drop b{font-size:16px}
+.kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
+.kv div{background:var(--sunk2);border-radius:10px;padding:10px 12px}
+.kv small{color:var(--muted);display:block;font-size:12px}
+.kv b{font-size:18px}
+.scroll{max-height:420px;overflow:auto;border:1px solid var(--line2);border-radius:10px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:10px;z-index:99;font-size:14px}
+.note{color:var(--muted);font-size:12.5px;margin:8px 0 0}
+.warnbox{background:var(--accent-soft);color:var(--ink);border-radius:10px;padding:10px 14px;margin:10px 0;font-size:13px}
+details summary{cursor:pointer}
+svg text{font-family:var(--f-body)}
+</style></head>
+<body>
+<div class="shell">
+<aside>
+  <div class="logo"><i>MG<br>평촌</i><div><b>FOH 발주</b><small>관리자 화면</small></div></div>
+  <nav id="nav"></nav>
+  <div class="foot"><div id="conn">연결 중…</div><div style="margin-top:8px"><a href="index.html?m=1">폰 화면으로 보기</a></div></div>
+</aside>
+<main id="main"><div class="empty">불러오는 중…</div></main>
+</div>
+<div id="toast" hidden></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* Firebase(Firestore) 저장소 어댑터 — 앱이 쓰는 db / downloads 인터페이스를 Firestore로 연결 */
+(function(){
+  if (window.claude) return;
+  const KEYS = ['apiKey','authDomain','projectId','storageBucket','messagingSenderId','appId'];
+  function setMsg(html){ const el=document.getElementById('main'); if(el) el.innerHTML='<div class="card"><div class="empty">'+html+'</div></div>'; }
+  async function loadConfig(){
+    const res = await fetch('firebase-config.js?v=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) throw new Error('firebase-config.js 를 찾지 못했습니다');
+    const t = (await res.text()).replace(/\/\*[\s\S]*?\*\//g,'').replace(/(^|[^:])\/\/.*$/gm,'$1'); const cfg = {};
+    for (const k of KEYS){ const m = t.match(new RegExp(k + '\\s*["\']?\\s*:\\s*["\']([^"\']+)["\']')); if (m) cfg[k] = m[1]; }
+    if (!cfg.apiKey || !cfg.projectId || cfg.apiKey.includes('여기')) throw new Error('firebase-config.js 에 Firebase 설정값을 붙여넣어 주세요');
+    return cfg;
+  }
+  async function seedIfEmpty(db){
+    if (!window.SEED) return;
+    const flag = await db.doc('meta/seeded').get();
+    if (flag.exists) return;
+    const cfg = await db.doc('config/main').get();
+    if (cfg.exists) { await db.doc('meta/seeded').set({at: new Date().toISOString(), skipped: true}); return; }
+    setMsg('처음 실행 · 기존 데이터를 옮기는 중입니다… (10초 정도)');
+    for (let i = 0; i < window.SEED.length; i += 400){
+      const b = db.batch();
+      for (const [p, d] of window.SEED.slice(i, i + 400)) b.set(db.doc(p), d);
+      await b.commit();
+    }
+    await db.doc('meta/seeded').set({at: new Date().toISOString(), count: window.SEED.length});
+  }
+  let dbp = null;
+  function getDb(){
+    if (dbp) return dbp;
+    dbp = (async () => {
+      try {
+        const cfg = await loadConfig();
+        firebase.initializeApp(cfg);
+        const db = firebase.firestore();
+        try { db.settings({ ignoreUndefinedProperties: true, merge: true }); } catch(e) {}
+        try { await db.enablePersistence({ synchronizeTabs: true }); } catch(e) {}
+        await seedIfEmpty(db);
+        return db;
+      } catch (e) {
+        console.warn(e);
+        setMsg('저장소에 연결하지 못했습니다.<br>' + (e && e.message ? e.message : '') + '<br><br>인터넷 연결과 Firebase 설정(firebase-config.js, 규칙)을 확인해 주세요.');
+        return null;
+      }
+    })();
+    return dbp;
+  }
+  const downloads = { async save({ filename, data, mimeType }) {
+    const blob = new Blob([data], { type: mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000); return { ok: true }; } };
+  window.claude = { use(name) {
+    if (name === 'db') return getDb().then(db => db ? wrap(db) : null);
+    if (name === 'downloads') return Promise.resolve(downloads);
+    return Promise.resolve(null);
+  } };
+  // 앱이 기대하는 모양(오류 코드 등)에 맞춘 얇은 래퍼
+  function wrap(db){
+    const fix = e => { const err = new Error(e && e.message); err.code = (e && e.code === 'permission-denied') ? 'invalid_argument' : 'unavailable'; throw err; };
+    return {
+      doc(p){ const r = db.doc(p); return {
+        onSnapshot(cb, onErr){ return r.onSnapshot(cb, onErr); },
+        get(){ return r.get(); },
+        set(obj){ return r.set(JSON.parse(JSON.stringify(obj))).catch(fix); },
+        delete(){ return r.delete().catch(fix); } }; },
+      collection(p){ const c = db.collection(p); return { onSnapshot(cb, onErr){ return c.onSnapshot(cb, onErr); } }; }
+    };
+  }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+
+</script>
+<script>
+/* 발주 계산 엔진 — 엑셀 오토발주와 같은 규칙 */
+const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
+function addDays(id, n) {
+  const [y, m, d] = id.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d + n));
+  return t.toISOString().slice(0, 10);
+}
+function mondayOf(date) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const w = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - w);
+  const p = (x) => String(x).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+function num(v) { return (v === null || v === undefined || v === '' || isNaN(Number(v))) ? null : Number(v); }
+function ceilTo(x, m) { m = Math.max(1, m || 1); return x <= 1e-9 ? 0 : Math.ceil(x / m - 1e-9) * m; }
+function itemRate(it, settings) {
+  const dr = num(it.directRate);
+  if (dr !== null && dr > 0) return dr;
+  const mu = num(it.monthUse), ms = num(settings.monthSales);
+  return (mu && ms) ? mu / ms * 1e6 : 0;
+}
+
+/* ctx: {weekId, todayId, settings, vendors:{id:v}, items:[...active], weekDocs:{wid:doc}, entries:{wid:{itemId:entry}}} */
+function computeWeek(ctx) {
+  const { weekId, todayId, settings } = ctx;
+  const W = ctx.weekDocs[weekId] || {};
+  const NWid = addDays(weekId, 7), PWid = addDays(weekId, -7);
+  const NW = ctx.weekDocs[NWid] || {};
+  const E = ctx.entries[weekId] || {}, PE = ctx.entries[PWid] || {};
+  const safety = num(settings.safety) || 1.2;
+  const monInc = !!settings.monInc;
+  const sales = [];
+  for (let d = 1; d <= 14; d++) {
+    if (d <= 7) sales[d] = num((W.sales || [])[d - 1]) || 0;
+    else {
+      const v = num((NW.sales || [])[d - 8]);
+      sales[d] = v !== null ? v : (num((W.sales || [])[d - 8]) || 0);
+    }
+  }
+  const out = {};
+  for (const it of ctx.items) {
+    const v = ctx.vendors[it.vendorId] || { sched: [null, null, null, null, null, null] };
+    const ent = E[it.id] || {};
+    const pent = PE[it.id] || {};
+    const rate = itemRate(it, settings);
+    const use = [0]; for (let d = 1; d <= 14; d++) use[d] = rate * sales[d] / 1e6;
+    const off = [], hol = [], A = [];
+    for (let b = 0; b < 6; b++) {
+      const o = num((v.sched || [])[b]);
+      off[b] = o;
+      A[b] = o === null ? null : b + 1 + o;
+      let h = false;
+      if (o !== null) {
+        if (((W.hol || {})[it.vendorId] || [])[b]) h = true;
+        const hd = v.holDates || [];
+        if (hd.includes(addDays(weekId, b)) || hd.includes(addDays(weekId, b + o))) h = true;
+        if (num(v.nthWeek) && v.nthDay) {
+          const ad = addDays(weekId, b + o);
+          const dt = new Date(ad + 'T00:00:00');
+          const wd = DAYS[(dt.getDay() + 6) % 7];
+          if (wd === v.nthDay && Math.floor((dt.getDate() - 1) / 7) + 1 === num(v.nthWeek)) h = true;
+        }
+      }
+      hol[b] = h;
+    }
+    // carry-over arrivals (지난주 발주분)
+    const carry = new Array(16).fill(0);
+    const manual = ent.arr || [];
+    if (num(manual[0]) !== null || num(manual[1]) !== null) {
+      carry[1] = num(manual[0]) || 0; carry[2] = num(manual[1]) || 0;
+    } else {
+      const pconf = pent.conf || [];
+      for (let b = 0; b < 6; b++) {
+        const o = num((v.sched || [])[b]); const c = num(pconf[b]);
+        if (o !== null && c) { const a = b + 1 + o; if (a > 7 && a - 7 <= 14) carry[a - 7] += c; }
+      }
+    }
+    const stockIn = [null]; for (let d = 1; d <= 6; d++) stockIn[d] = num((ent.stock || [])[d - 1]);
+    // 입고 후에 센 재고: 그날 입고분은 이미 재고에 들어있음 → 다시 더하지 않음
+    const incDay = (d) => monInc && d <= 6 && stockIn[d] !== null;
+    const conf = []; for (let b = 0; b < 6; b++) conf[b] = num((ent.conf || [])[b]);
+    const rec = [], used = [], P = [], cov = [], NA = [], past = [];
+    const minS = num(it.minStock), minQ = num(it.minQty), mult = num(it.mult) || 1;
+    let firstK = null; for (let d = 1; d <= 6; d++) if (stockIn[d] !== null) { firstK = d; break; }
+    const Kday = [];
+    for (let b = 0; b < 6; b++) {
+      past[b] = addDays(weekId, b) < todayId;
+      let K = null; for (let d = 1; d <= b + 1; d++) if (stockIn[d] !== null) K = d;
+      Kday[b] = K;
+      if (off[b] === null) { rec[b] = null; used[b] = 0; continue; }
+      const noStock = K === null;
+      if (noStock) K = 1;
+      const start = stockIn[K] || 0;
+      let arr = 0, us = 0;
+      for (let d = K; d < A[b]; d++) { if (!(d === K && incDay(K))) arr += carry[d]; us += use[d] || 0; }
+      for (let bp = 0; bp < b; bp++) if (A[bp] !== null && A[bp] >= K && A[bp] < A[b] && !(A[bp] === K && incDay(K))) arr += used[bp];
+      P[b] = Math.max(0, start + arr - us);
+      let na = null;
+      for (let bp = b + 1; bp < 6; bp++) if (off[bp] !== null && !hol[bp]) { na = A[bp]; break; }
+      if (na === null) for (let bp = 0; bp < 6; bp++) if (off[bp] !== null) { na = A[bp] + 7; break; }
+      NA[b] = na;
+      let c = 0; for (let d = A[b]; d < na && d <= 14; d++) c += use[d] || 0;
+      cov[b] = c;
+      if (noStock) rec[b] = null;
+      else if (hol[b]) rec[b] = '휴무';
+      else if (minS !== null) rec[b] = P[b] <= minS ? ceilTo(Math.max(minQ || 1, 1), mult) : 0;
+      else if (rate === 0) rec[b] = null;
+      else rec[b] = ceilTo(Math.max(0, c * safety - P[b]), mult);
+      used[b] = hol[b] ? 0 : (conf[b] !== null ? conf[b] : (past[b] ? 0 : (typeof rec[b] === 'number' ? rec[b] : 0)));
+    }
+    const open = [0], arrD = [0], close = [0], after = [0];
+    for (let d = 1; d <= 14; d++) {
+      let a = carry[d];
+      for (let b = 0; b < 6; b++) if (A[b] === d) a += used[b];
+      arrD[d] = a;
+      if (firstK === null || d < firstK) { open[d] = null; close[d] = null; after[d] = null; continue; }
+      open[d] = (d <= 6 && stockIn[d] !== null) ? stockIn[d] : close[d - 1];
+      const add = incDay(d) ? 0 : a;
+      close[d] = Math.max(0, open[d] + add - (use[d] || 0));
+      after[d] = open[d] + add;
+    }
+    let weekUse = 0; for (let d = 1; d <= 7; d++) weekUse += use[d];
+    let weekArr = 0; for (let d = 1; d <= 7; d++) weekArr += arrD[d]; if (monInc) { weekArr += arrD[8]; if (stockIn[1] !== null) weekArr -= arrD[1]; }
+    out[it.id] = { rate, off, hol, A, rec, used, conf, P, cov, NA, past, stockIn, use, after, arrD, weekUse, weekArr,
+      red: [1, 2, 3, 4, 5, 6].map(d => after[d] !== null && after[d] < (use[d] || 0) - 1e-9), hasMon: stockIn[1] !== null,
+      hasStock: firstK !== null, firstK, Kday };
+  }
+  return { sales, out };
+}
+if (false && typeof module !== 'undefined') module.exports = { computeWeek, addDays, mondayOf, itemRate, ceilTo };
+
+
+</script>
+<script src="act.js"></script>
+<script src="admin.js"></script>
+<script src="export2.js"></script>
+</body></html>

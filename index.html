@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="FOH 발주">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>MG롯데평촌점 FOH 발주</title>
+<script>(function(){try{var q=location.search;if(/[?&]m=1/.test(q)){localStorage.setItem('onse.mode','m')}var pref=localStorage.getItem('onse.mode');var wide=window.matchMedia('(min-width: 1100px) and (pointer: fine)').matches;if(wide&&pref!=='m'){location.replace('admin.html');return}if(wide){document.addEventListener('DOMContentLoaded',function(){var a=document.createElement('a');a.href='admin.html';a.textContent='PC 관리자 화면 →';a.style.cssText='position:fixed;right:16px;bottom:16px;z-index:50;background:#2B2B2B;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;font-size:14px';document.body.appendChild(a)})}}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
@@ -441,7 +442,7 @@ function searchBox(){return ''}
 function noMatch(){return S.q?`<div class="card"><div class="empty">"${esc(S.q)}" 검색 결과가 없습니다.</div></div>`:''}
 function groupChips(){const gs=groupsList();if(gs.length<2)return '';const cur=gs.includes(S.vf)?S.vf:'*';
   return `<div class="chips vf" role="tablist" aria-label="업체 묶음">${['*',...gs].map(g=>`<button class="chip" data-vf="${esc(g)}" aria-pressed="${cur===g}">${g==='*'?'전체':esc(g)}</button>`).join('')}</div>`}
-function calc(wid){return computeWeek({weekId:wid,todayId,settings:S.settings,vendors:S.vendors,items:activeItems(),weekDocs:S.weeks,entries:S.entries})}
+function calc(wid){return computeWeek({weekId:wid,todayId,settings:S.settings,vendors:S.vendors,items:activeItems(),weekDocs:S.weeks,entries:(typeof effEntries==='function'?effEntries():S.entries)})}
 function subEntries(){
   const want=new Set([addDays(S.view,-14),addDays(S.view,-7),S.view,addDays(S.view,7),...(S.extraWeeks||[])]);
   for(const w of Object.keys(S.entUnsub)) if(!want.has(w)){S.entUnsub[w]();delete S.entUnsub[w]}
@@ -508,7 +509,8 @@ function vOrder(){
       const recHtml=hol?`<span class="rec2 hol">휴무</span>`:rec==null?`<span class="rec2 zero">${isManual(it)?'직접 판단':o.Kday[b]===null?'재고 필요':'사용량 없음'}</span>`:`<span class="rec2 ${rec===0?'zero':''}">추천 <b class="num">${fmt(rec,0)}</b></span>`;
       const W7='월화수목금토일',dn=d=>W7[(d-1)%7],aD=o.A[b],nD=o.NA[b];const rng=nD?(nD-1>aD?`${dn(aD)}~${dn(nD-1)}`:dn(aD)):'';
       const meta=hol?'':`<div class="ometa"><span>${aD?dn(aD)+' 입고 전(예상)':'입고 전(예상)'} <b class="num">${o.Kday[b]===null?'–':fmt(o.P[b])}</b></span>${nD?`<span>forecast <b class="num">${fmt(o.cov[b])}</b></span>`:''}${it.minStock!=null&&it.minStock!==''?`<span class="pill warn">최소 ${it.minStock}</span>`:''}${miss?'<span class="bad">미입력</span>':''}</div>`;
-      const mine=hol?'':`<div class="mine"><button class="step" data-step="${it.id}:-1" aria-label="${esc(it.name)} 발주 줄이기">−</button><input class="n ${miss?'miss':conf!=null?'set':''}" inputmode="decimal" aria-label="${esc(it.name)} 내 발주 수량" data-conf="${it.id}" value="${conf??''}"><button class="step" data-step="${it.id}:1" aria-label="${esc(it.name)} 발주 늘리기">+</button></div>`;
+      const actOn=typeof actCovered==='function'&&actCovered(S.view,b,it.vendorId);
+      const mine=hol?'':actOn?`<div class="mine"><span class="pill ok" title="발주 사이트 파일 기준">실제 발주 <b class="num">${fmt(conf??0)}</b></span></div>`:`<div class="mine"><button class="step" data-step="${it.id}:-1" aria-label="${esc(it.name)} 발주 줄이기">−</button><input class="n ${miss?'miss':conf!=null?'set':''}" inputmode="decimal" aria-label="${esc(it.name)} 내 발주 수량" data-conf="${it.id}" value="${conf??''}"><button class="step" data-step="${it.id}:1" aria-label="${esc(it.name)} 발주 늘리기">+</button></div>`;
       html+=`<div class="orow"><div class="ol"><div class="oname">${esc(it.name)}<small>${esc(it.spec||'')}${it.unit?' · '+esc(it.unit):''}${(it.mult||1)>1?` · ${it.mult}단위`:''}</small></div>${recHtml}</div>${hol?'':`<div class="ol">${meta}${mine}</div>`}</div>`;
     }
     html+=`</section>`;
@@ -1054,6 +1056,7 @@ render();
 })();
 </script>
 
+<script src="act.js"></script>
 <script src="export2.js"></script>
 </body>
 </html>
