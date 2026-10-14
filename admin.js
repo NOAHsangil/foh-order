@@ -519,6 +519,7 @@ function daysIn(mk) { const [y, m] = mk.split('-').map(Number); return new Date(
 function vSubul() {
   const months = subulMonths();
   let h = `<div class="top"><h1>수불 분석</h1>${months.length ? `<div class="chips">${months.map(m => `<button class="chip" data-smon="${m}" aria-pressed="${(S.smon || months[months.length - 1]) === m}">${Number(m.slice(0, 4))}년 ${Number(m.slice(5))}월</button>`).join('')}</div>` : ''}<span class="spacer"></span><label class="btn pri" style="cursor:pointer">수불현황 파일 올리기<input type="file" id="sfile" accept=".xls,.xlsx,.html,.htm" hidden></label></div>`;
+  if (!S.sup) h += `<label class="drop" id="sdrop" style="padding:22px;margin-bottom:16px"><input type="file" id="sfile2" accept=".xls,.xlsx,.html,.htm" hidden><b>수불현황 파일 올리기</b><div class="sub" style="margin-top:4px">영업시스템에서 받은 수불현황 엑셀을 여기에 끌어다 놓거나 클릭해서 고르세요 · 달마다 따로 저장됩니다</div></label>`;
   if (S.sup) {
     const U = S.sup; const tot = U.items.reduce((a, x) => a + x.use[1], 0);
     h += `<div class="card"><h2>수불현황 저장 <span class="sub">${esc(U.file)} · ${U.items.length}개 품목 · 사용 금액 ${won(tot)}원</span></h2>
@@ -682,7 +683,7 @@ document.addEventListener('click', async e => {
 });
 document.addEventListener('change', async e => {
   const t = e.target; const d = t.dataset || {};
-  if (t.id === 'sfile') { await onSubulFile(t.files[0]); t.value = ''; return; }
+  if (t.id === 'sfile' || t.id === 'sfile2') { await onSubulFile(t.files[0]); t.value = ''; return; }
   if (t.id === 'ioff') { S.ioff = t.checked; render(); return; }
   if (d.isel) { t.checked ? S.isel.add(d.isel) : S.isel.delete(d.isel); render(); return; }
   if (t.hasAttribute('data-iselall')) { const boxes = [...document.querySelectorAll('[data-isel]')]; boxes.forEach(b => t.checked ? S.isel.add(b.dataset.isel) : S.isel.delete(b.dataset.isel)); render(); return; }
@@ -737,9 +738,9 @@ document.addEventListener('keydown', e => {
   else el = document.querySelector(`input[data-r="${nr}"][data-c="${nc}"]`);
   if (el) { t.dispatchEvent(new Event('change', { bubbles: true })); el.focus(); el.select(); }
 });
-['dragover', 'dragenter'].forEach(ev => document.addEventListener(ev, e => { const d = e.target.closest && e.target.closest('#drop'); if (d) { e.preventDefault(); d.classList.add('over'); } }));
-document.addEventListener('dragleave', e => { const d = e.target.closest && e.target.closest('#drop'); if (d) d.classList.remove('over'); });
-document.addEventListener('drop', e => { const d = e.target.closest && e.target.closest('#drop'); if (d) { e.preventDefault(); d.classList.remove('over'); onOrderFile(e.dataTransfer.files[0]); } });
+['dragover', 'dragenter'].forEach(ev => document.addEventListener(ev, e => { const d = e.target.closest && e.target.closest('#drop,#sdrop'); if (d) { e.preventDefault(); d.classList.add('over'); } }));
+document.addEventListener('dragleave', e => { const d = e.target.closest && e.target.closest('#drop,#sdrop'); if (d) d.classList.remove('over'); });
+document.addEventListener('drop', e => { const d = e.target.closest && e.target.closest('#drop,#sdrop'); if (d) { e.preventDefault(); d.classList.remove('over'); (d.id === 'sdrop' ? onSubulFile : onOrderFile)(e.dataTransfer.files[0]); } });
 
 /* ---------- boot ---------- */
 render();
