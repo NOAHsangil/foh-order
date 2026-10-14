@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2B2B2B">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FOH 발주">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>MG롯데평촌점 FOH 발주</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one-column phone app — sticky week bar on top, tab bar fixed at bottom, content as dense cards */
+:root{
+  --bg:#F3F5F2; --surface:#FFFFFF; --sunk:#E9EDE8; --ink:#1B2320; --muted:#66716B; --line:#D8DED9;
+  --brand:#1F4B3D; --brand-ink:#FFFFFF; --accent:#C9702A; --accent-soft:#FBEBDD;
+  --danger:#B93A2B; --danger-soft:#FBE3DF; --ok:#2E7A4E; --ok-soft:#E0F1E6; --hol:#8D9490;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121715; --surface:#1A211E; --sunk:#232B28; --ink:#E6ECE8; --muted:#97A39C; --line:#2F3934;
+  --brand:#7FC4A5; --brand-ink:#0E1512; --accent:#F0A262; --accent-soft:#3A2A1C;
+  --danger:#F08A7A; --danger-soft:#3B201C; --ok:#7FD1A0; --ok-soft:#1C3326; --hol:#7A827E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121715; --surface:#1A211E; --sunk:#232B28; --ink:#E6ECE8; --muted:#97A39C; --line:#2F3934;
+  --brand:#7FC4A5; --brand-ink:#0E1512; --accent:#F0A262; --accent-soft:#3A2A1C;
+  --danger:#F08A7A; --danger-soft:#3B201C; --ok:#7FD1A0; --ok-soft:#1C3326; --hol:#7A827E; color-scheme:dark}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:calc(15px*var(--fz,1));line-height:1.45;padding-inline:16px;padding-block:0 96px}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);margin-inline:-16px;padding:12px 16px 10px;border-bottom:1px solid var(--line)}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:640px;margin:0 auto}
+.brand{font-weight:700;font-size:calc(18px*var(--fz,1));letter-spacing:-.01em;white-space:nowrap;line-height:1.2}
+.brand small.pre{font-size:calc(12px*var(--fz,1));font-weight:600;color:var(--brand);letter-spacing:0}
+#who:empty{display:none}
+.brand small{display:block;font-weight:500;font-size:calc(11px*var(--fz,1));color:var(--muted);letter-spacing:.02em}
+.weeknav{display:flex;align-items:center;gap:4px}
+.weeknav button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;min-width:34px;height:34px;font:inherit;cursor:pointer}
+.weeknav .wk{font-family:var(--f-num);font-size:calc(13px*var(--fz,1));padding:0 6px;white-space:nowrap}
+.weeknav .now{font-size:calc(12px*var(--fz,1));padding:0 10px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+nav.tabs button{background:none;border:0;color:var(--muted);font:inherit;font-size:calc(12px*var(--fz,1));padding:10px 0 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.tabs button b{font-size:calc(15px*var(--fz,1));font-weight:700}
+nav.tabs button[aria-current="page"]{color:var(--brand)}
+nav.tabs button[aria-current="page"] b::after{content:"";display:block;height:3px;border-radius:2px;background:var(--brand);margin-top:3px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.chip{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:6px 10px;font:inherit;font-size:calc(13px*var(--fz,1));cursor:pointer;text-align:center;min-width:52px}
+.chip span{display:block;font-family:var(--f-num);font-size:calc(11px*var(--fz,1));color:var(--muted)}
+.chips.vf{margin:6px 0 8px}
+.banner.caution{background:#FFF4D6;color:#6B4E00;border:1px solid #F0D58A;font-size:calc(12px*var(--fz,1));line-height:1.45;display:block}
+@media (prefers-color-scheme:dark){.banner.caution{background:#3A2F12;color:#F3D98B;border-color:#5C4A1A}}
+.sgrid{display:grid;grid-template-columns:auto 1fr auto 48px;gap:4px 8px;align-items:center;margin-top:8px;font-size:calc(12px*var(--fz,1));color:var(--muted)}
+.sgrid b{color:var(--ink);text-align:right;font-size:calc(13px*var(--fz,1))}.sgrid small{text-align:right}
+.tgc{gap:6px}.tgc label{display:flex;align-items:center;gap:3px;font-size:calc(12px*var(--fz,1));color:var(--muted)}.tgc input.n{width:52px}.tgc input.n.w{width:96px;font-size:calc(14px*var(--fz,1))}
+.dtab{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:7px 8px;padding:10px 14px 12px;font-size:calc(12px*var(--fz,1));align-items:center}.dtab .h{color:var(--muted);font-size:calc(11px*var(--fz,1));text-align:right}.dtab .h:first-child{text-align:left}.dtab b{text-align:right;font-weight:600}.dtab small{color:var(--muted)}
+.sbar2{height:8px;border-radius:4px;background:var(--sunk);overflow:hidden}.sbar2 i{display:block;height:100%;border-radius:4px}
+.sbar{padding-top:10px;padding-bottom:4px}
+#q::-webkit-search-cancel-button{-webkit-appearance:none;display:none}.sbar[hidden]{display:none}
+.search{position:relative;margin:0}.search .t{width:100%;padding-right:40px}
+.search .qx{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:var(--sunk);color:var(--muted);width:28px;height:28px;border-radius:50%;font-size:calc(18px*var(--fz,1));line-height:1;cursor:pointer}.chips.vf .chip{border-radius:999px;padding:6px 14px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.chip[aria-pressed="true"] span{color:var(--brand-ink);opacity:.8}
+.chip.dim{opacity:.45}
+h2{font-size:calc(18px*var(--fz,1));margin:4px 0 0;text-wrap:balance}
+.sub{color:var(--muted);font-size:calc(13px*var(--fz,1))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.card>.hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 14px;background:var(--sunk);font-weight:700;font-size:calc(14px*var(--fz,1))}
+.card>.hd .sub{font-weight:500}
+.row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.card>.hd+.row{border-top:0}
+.name{font-weight:600;min-width:0}
+.name small{display:block;font-weight:400;color:var(--muted);font-size:calc(12px*var(--fz,1));overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:calc(12px*var(--fz,1));color:var(--muted);margin-top:3px}
+.meta .bad{color:var(--danger);font-weight:600}
+.note.bad{color:var(--danger);font-weight:600}
+.ctrl{display:flex;align-items:center;gap:8px}
+.expv{display:flex;flex-direction:column;align-items:flex-end;text-align:right;font-size:calc(10px*var(--fz,1));color:var(--muted);line-height:1.15}.expv b{font-size:calc(13px*var(--fz,1));color:var(--muted);font-weight:600}
+.rec{min-width:52px;text-align:center;border-radius:10px;padding:4px 6px;background:var(--accent-soft);color:var(--accent);font-family:var(--f-num);font-weight:600;font-size:calc(18px*var(--fz,1));line-height:1.1}
+.rec small{display:block;font-family:var(--f-body);font-size:calc(10px*var(--fz,1));font-weight:500;color:var(--muted)}
+.rec.zero{background:var(--sunk);color:var(--muted)}
+.rec.hol{background:var(--sunk);color:var(--hol);font-size:calc(13px*var(--fz,1))}
+input.n{width:68px;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-family:var(--f-num);font-size:calc(17px*var(--fz,1));text-align:center;padding:0 4px}
+input.n:focus,input.t:focus,select:focus{outline:2px solid var(--brand);outline-offset:1px}
+input.n.miss{border-color:var(--danger);background:var(--danger-soft)}
+input.n.set{border-color:var(--ok)}
+input.t,select{height:38px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:calc(15px*var(--fz,1));padding:0 10px;width:100%;min-width:0}
+html.ios input.t,html.ios select,html.ios input.n{font-size:16px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 12px;font:inherit;font-size:calc(13px*var(--fz,1));cursor:pointer}
+.btn.pri{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);font-weight:700}
+.btn.sm{padding:5px 9px;font-size:calc(12px*var(--fz,1))}
+.btn:disabled{opacity:.5;cursor:default}
+.banner{border-radius:var(--r);padding:12px 14px;font-size:calc(14px*var(--fz,1));display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.banner.warn{background:var(--danger-soft);color:var(--danger)}
+.banner.info{background:var(--sunk);color:var(--ink)}
+.sum{display:flex;gap:16px;flex-wrap:wrap;padding:12px 14px;font-size:calc(13px*var(--fz,1));color:var(--muted)}
+.sum b{color:var(--ink);font-family:var(--f-num);font-size:calc(16px*var(--fz,1))}
+.pill{display:inline-block;border-radius:999px;padding:1px 8px;font-size:calc(11px*var(--fz,1));font-weight:600}
+.pill.hol{background:var(--sunk);color:var(--hol)}
+.pill.bad{background:var(--danger-soft);color:var(--danger)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--accent-soft);color:var(--accent)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 14px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:calc(12px*var(--fz,1));color:var(--muted);min-width:0}
+.salesrow{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;padding:8px 14px;border-top:1px solid var(--line)}
+.salesrow input{width:100%;text-align:right;font-family:var(--f-num)}
+.tablewrap{overflow-x:auto}
+table.wk{border-collapse:collapse;font-size:calc(12px*var(--fz,1));min-width:620px;width:100%}
+table.wk th,table.wk td{border-bottom:1px solid var(--line);padding:6px 6px;text-align:center;white-space:nowrap}
+table.wk th{background:var(--sunk);font-weight:600;position:sticky;top:0}
+table.wk td.l,table.wk th.l{text-align:left;position:sticky;left:0;background:var(--surface);max-width:150px;overflow:hidden;text-overflow:ellipsis}
+table.wk th.l{background:var(--sunk)}
+table.wk td .c{font-weight:700;color:var(--ink)} table.wk td .r{color:var(--accent)}
+table.wk td.off{background:var(--sunk);color:var(--hol)}
+.vd{padding:12px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.sched{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.sched label{font-size:calc(11px*var(--fz,1));color:var(--muted);text-align:center;display:flex;flex-direction:column;gap:2px}
+.sched select{padding:0 2px;text-align:center}
+.it{padding:10px 14px;border-top:1px solid var(--line)}
+.vgrp{border-top:1px solid var(--line)}
+.vgrp>summary{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;list-style:none;font-weight:600}
+.vgrp>summary::-webkit-details-marker{display:none}
+.vgrp>summary .name{flex:1}
+.vgrp>summary .chev{transition:transform .15s;color:var(--muted);font-size:calc(18px*var(--fz,1));line-height:1}
+.vgrp[open]>summary{background:var(--sunk)}
+.vgrp[open]>summary .chev{transform:rotate(90deg)}
+.vgrp .it{padding-left:22px}
+.it summary{display:flex;justify-content:space-between;gap:8px;cursor:pointer;list-style:none}
+.it summary::-webkit-details-marker{display:none}
+.it.off .name{color:var(--muted);text-decoration:line-through}
+.toggle{border-radius:999px;border:1px solid var(--line);padding:3px 10px;font-size:calc(12px*var(--fz,1));font-weight:700;background:var(--surface);cursor:pointer;color:var(--muted)}
+.toggle.on{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.empty{padding:24px 14px;text-align:center;color:var(--muted);font-size:calc(14px*var(--fz,1))}
+.note{font-size:calc(12px*var(--fz,1));color:var(--muted);padding:0 2px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:calc(13px*var(--fz,1));z-index:9}
+.holgrid{display:flex;flex-wrap:wrap;gap:6px}
+.orow{display:flex;flex-direction:column;gap:4px;padding:8px 14px;border-top:1px solid var(--line)}
+.ol{display:flex;align-items:center;gap:10px;min-width:0}
+.ol>.oname,.ol>.ometa{flex:1;min-width:0}
+.oname{font-weight:600;font-size:calc(14px*var(--fz,1));line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.oname small{font-weight:400;color:var(--muted);font-size:calc(11px*var(--fz,1));margin-left:5px}
+.rec2{flex:0 0 auto;white-space:nowrap;font-size:calc(12px*var(--fz,1));color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:2px 9px;font-weight:600}
+.rec2 b{font-size:calc(15px*var(--fz,1))}
+.rec2.zero{color:var(--muted);background:var(--sunk)}
+.rec2.hol{color:var(--hol);background:var(--sunk)}
+.ometa{display:flex;gap:4px 8px;flex-wrap:wrap;align-items:center;font-size:calc(11px*var(--fz,1));color:var(--muted);min-width:0}
+.ometa b{color:var(--ink)}
+.ometa .bad{color:var(--danger);font-weight:600}
+.card>.hd+.orow{border-top:0}
+.oline{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.reclab{display:flex;align-items:center;gap:8px;font-size:calc(12px*var(--fz,1));color:var(--muted)}
+.mine{display:flex;align-items:center;gap:6px;font-size:calc(12px*var(--fz,1));color:var(--muted)}
+.mine .lab{font-weight:700;color:var(--ink)}
+.step{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:calc(20px*var(--fz,1));line-height:1;cursor:pointer;font-family:var(--f-num)}
+.mine input.n{width:56px;height:34px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:10px 14px 14px}
+.cal .dh{font-size:calc(11px*var(--fz,1));color:var(--muted);text-align:center;padding:2px 0}
+.cal button{aspect-ratio:1/1;max-width:100%;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-family:var(--f-num);font-size:calc(14px*var(--fz,1));cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0}
+.cal button small{font-family:var(--f-body);font-size:calc(9px*var(--fz,1));line-height:1}
+.cal button.closed{background:var(--danger-soft);color:var(--danger);border-color:var(--danger);font-weight:700}
+.cal button.auto{background:var(--sunk);color:var(--hol);border-style:dashed}
+.cal button.today{outline:2px solid var(--brand);outline-offset:-2px}
+.cal .blank{visibility:hidden}
+.mnav{display:flex;align-items:center;gap:6px}
+@media (prefers-reduced-motion: no-preference){.chip,.btn,.toggle{transition:background .15s,color .15s}}
+</style>
+
+</head>
+<body>
+<header class="top"><div class="top-row">
+  <div class="brand"><small class="pre">MG롯데평촌점</small>FOH 발주<small id="who"></small></div>
+  <div class="weeknav">
+    <button id="prevW" aria-label="이전 주">‹</button>
+    <span class="wk" id="wkLabel">—</span>
+    <button id="nextW" aria-label="다음 주">›</button>
+    <button id="thisW" class="now">이번 주</button>
+  </div>
+</div></header>
+<div class="wrap sbar" id="sbar" hidden><div class="search"><input id="q" class="t" type="search" autocomplete="off" placeholder="품목 검색 (이름·코드·초성 ㅅㅈㅃ)" aria-label="품목 검색"><button class="qx" data-qclear aria-label="검색 지우기" hidden>×</button></div></div>
+<main class="wrap" id="app"><div class="empty">불러오는 중…</div></main>
+<nav class="tabs"><div class="in" id="tabs"></div></nav>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="seed.js"></script>
+<script>
+/* Firebase(Firestore) 저장소 어댑터 — 앱이 쓰는 db / downloads 인터페이스를 Firestore로 연결 */
+(function(){
+  if (window.claude) return;
+  const KEYS = ['apiKey','authDomain','projectId','storageBucket','messagingSenderId','appId'];
+  function setMsg(html){ const el=document.getElementById('app'); if(el) el.innerHTML='<div class="card"><div class="empty">'+html+'</div></div>'; }
+  async function loadConfig(){
+    const res = await fetch('firebase-config.js?v=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) throw new Error('firebase-config.js 를 찾지 못했습니다');
+    const t = (await res.text()).replace(/\/\*[\s\S]*?\*\//g,'').replace(/(^|[^:])\/\/.*$/gm,'$1'); const cfg = {};
+    for (const k of KEYS){ const m = t.match(new RegExp(k + '\\s*["\']?\\s*:\\s*["\']([^"\']+)["\']')); if (m) cfg[k] = m[1]; }
+    if (!cfg.apiKey || !cfg.projectId || cfg.apiKey.includes('여기')) throw new Error('firebase-config.js 에 Firebase 설정값을 붙여넣어 주세요');
+    return cfg;
+  }
+  async function seedIfEmpty(db){
+    if (!window.SEED) return;
+    const flag = await db.doc('meta/seeded').get();
+    if (flag.exists) return;
+    const cfg = await db.doc('config/main').get();
+    if (cfg.exists) { await db.doc('meta/seeded').set({at: new Date().toISOString(), skipped: true}); return; }
+    setMsg('처음 실행 · 기존 데이터를 옮기는 중입니다… (10초 정도)');
+    for (let i = 0; i < window.SEED.length; i += 400){
+      const b = db.batch();
+      for (const [p, d] of window.SEED.slice(i, i + 400)) b.set(db.doc(p), d);
+      await b.commit();
+    }
+    await db.doc('meta/seeded').set({at: new Date().toISOString(), count: window.SEED.length});
+  }
+  let dbp = null;
+  function getDb(){
+    if (dbp) return dbp;
+    dbp = (async () => {
+      try {
+        const cfg = await loadConfig();
+        firebase.initializeApp(cfg);
+        const db = firebase.firestore();
+        try { db.settings({ ignoreUndefinedProperties: true, merge: true }); } catch(e) {}
+        try { await db.enablePersistence({ synchronizeTabs: true }); } catch(e) {}
+        await seedIfEmpty(db);
+        return db;
+      } catch (e) {
+        console.warn(e);
+        setMsg('저장소에 연결하지 못했습니다.<br>' + (e && e.message ? e.message : '') + '<br><br>인터넷 연결과 Firebase 설정(firebase-config.js, 규칙)을 확인해 주세요.');
+        return null;
+      }
+    })();
+    return dbp;
+  }
+  const downloads = { async save({ filename, data, mimeType }) {
+    const blob = new Blob([data], { type: mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000); return { ok: true }; } };
+  window.claude = { use(name) {
+    if (name === 'db') return getDb().then(db => db ? wrap(db) : null);
+    if (name === 'downloads') return Promise.resolve(downloads);
+    return Promise.resolve(null);
+  } };
+  // 앱이 기대하는 모양(오류 코드 등)에 맞춘 얇은 래퍼
+  function wrap(db){
+    const fix = e => { const err = new Error(e && e.message); err.code = (e && e.code === 'permission-denied') ? 'invalid_argument' : 'unavailable'; throw err; };
+    return {
+      doc(p){ const r = db.doc(p); return {
+        onSnapshot(cb, onErr){ return r.onSnapshot(cb, onErr); },
+        get(){ return r.get(); },
+        set(obj){ return r.set(JSON.parse(JSON.stringify(obj))).catch(fix); },
+        delete(){ return r.delete().catch(fix); } }; },
+      collection(p){ const c = db.collection(p); return { onSnapshot(cb, onErr){ return c.onSnapshot(cb, onErr); } }; }
+    };
+  }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+<script>
+/* 발주 계산 엔진 — 엑셀 오토발주와 같은 규칙 */
+const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
+function addDays(id, n) {
+  const [y, m, d] = id.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d + n));
+  return t.toISOString().slice(0, 10);
+}
+function mondayOf(date) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const w = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - w);
+  const p = (x) => String(x).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+function num(v) { return (v === null || v === undefined || v === '' || isNaN(Number(v))) ? null : Number(v); }
+function ceilTo(x, m) { m = Math.max(1, m || 1); return x <= 1e-9 ? 0 : Math.ceil(x / m - 1e-9) * m; }
+function itemRate(it, settings) {
+  const dr = num(it.directRate);
+  if (dr !== null && dr > 0) return dr;
+  const mu = num(it.monthUse), ms = num(settings.monthSales);
+  return (mu && ms) ? mu / ms * 1e6 : 0;
+}
+
+/* ctx: {weekId, todayId, settings, vendors:{id:v}, items:[...active], weekDocs:{wid:doc}, entries:{wid:{itemId:entry}}} */
+function computeWeek(ctx) {
+  const { weekId, todayId, settings } = ctx;
+  const W = ctx.weekDocs[weekId] || {};
+  const NWid = addDays(weekId, 7), PWid = addDays(weekId, -7);
+  const NW = ctx.weekDocs[NWid] || {};
+  const E = ctx.entries[weekId] || {}, PE = ctx.entries[PWid] || {};
+  const safety = num(settings.safety) || 1.2;
+  const monInc = !!settings.monInc;
+  const sales = [];
+  for (let d = 1; d <= 14; d++) {
+    if (d <= 7) sales[d] = num((W.sales || [])[d - 1]) || 0;
+    else {
+      const v = num((NW.sales || [])[d - 8]);
+      sales[d] = v !== null ? v : (num((W.sales || [])[d - 8]) || 0);
+    }
+  }
+  const out = {};
+  for (const it of ctx.items) {
+    const v = ctx.vendors[it.vendorId] || { sched: [null, null, null, null, null, null] };
+    const ent = E[it.id] || {};
+    const pent = PE[it.id] || {};
+    const rate = itemRate(it, settings);
+    const use = [0]; for (let d = 1; d <= 14; d++) use[d] = rate * sales[d] / 1e6;
+    const off = [], hol = [], A = [];
+    for (let b = 0; b < 6; b++) {
+      const o = num((v.sched || [])[b]);
+      off[b] = o;
+      A[b] = o === null ? null : b + 1 + o;
+      let h = false;
+      if (o !== null) {
+        if (((W.hol || {})[it.vendorId] || [])[b]) h = true;
+        const hd = v.holDates || [];
+        if (hd.includes(addDays(weekId, b)) || hd.includes(addDays(weekId, b + o))) h = true;
+        if (num(v.nthWeek) && v.nthDay) {
+          const ad = addDays(weekId, b + o);
+          const dt = new Date(ad + 'T00:00:00');
+          const wd = DAYS[(dt.getDay() + 6) % 7];
+          if (wd === v.nthDay && Math.floor((dt.getDate() - 1) / 7) + 1 === num(v.nthWeek)) h = true;
+        }
+      }
+      hol[b] = h;
+    }
+    // carry-over arrivals (지난주 발주분)
+    const carry = new Array(16).fill(0);
+    const manual = ent.arr || [];
+    if (num(manual[0]) !== null || num(manual[1]) !== null) {
+      carry[1] = num(manual[0]) || 0; carry[2] = num(manual[1]) || 0;
+    } else {
+      const pconf = pent.conf || [];
+      for (let b = 0; b < 6; b++) {
+        const o = num((v.sched || [])[b]); const c = num(pconf[b]);
+        if (o !== null && c) { const a = b + 1 + o; if (a > 7 && a - 7 <= 14) carry[a - 7] += c; }
+      }
+    }
+    const stockIn = [null]; for (let d = 1; d <= 6; d++) stockIn[d] = num((ent.stock || [])[d - 1]);
+    // 입고 후에 센 재고: 그날 입고분은 이미 재고에 들어있음 → 다시 더하지 않음
+    const incDay = (d) => monInc && d <= 6 && stockIn[d] !== null;
+    const conf = []; for (let b = 0; b < 6; b++) conf[b] = num((ent.conf || [])[b]);
+    const rec = [], used = [], P = [], cov = [], NA = [], past = [];
+    const minS = num(it.minStock), minQ = num(it.minQty), mult = num(it.mult) || 1;
+    let firstK = null; for (let d = 1; d <= 6; d++) if (stockIn[d] !== null) { firstK = d; break; }
+    const Kday = [];
+    for (let b = 0; b < 6; b++) {
+      past[b] = addDays(weekId, b) < todayId;
+      let K = null; for (let d = 1; d <= b + 1; d++) if (stockIn[d] !== null) K = d;
+      Kday[b] = K;
+      if (off[b] === null) { rec[b] = null; used[b] = 0; continue; }
+      const noStock = K === null;
+      if (noStock) K = 1;
+      const start = stockIn[K] || 0;
+      let arr = 0, us = 0;
+      for (let d = K; d < A[b]; d++) { if (!(d === K && incDay(K))) arr += carry[d]; us += use[d] || 0; }
+      for (let bp = 0; bp < b; bp++) if (A[bp] !== null && A[bp] >= K && A[bp] < A[b] && !(A[bp] === K && incDay(K))) arr += used[bp];
+      P[b] = Math.max(0, start + arr - us);
+      let na = null;
+      for (let bp = b + 1; bp < 6; bp++) if (off[bp] !== null && !hol[bp]) { na = A[bp]; break; }
+      if (na === null) for (let bp = 0; bp < 6; bp++) if (off[bp] !== null) { na = A[bp] + 7; break; }
+      NA[b] = na;
+      let c = 0; for (let d = A[b]; d < na && d <= 14; d++) c += use[d] || 0;
+      cov[b] = c;
+      if (noStock) rec[b] = null;
+      else if (hol[b]) rec[b] = '휴무';
+      else if (minS !== null) rec[b] = P[b] <= minS ? ceilTo(Math.max(minQ || 1, 1), mult) : 0;
+      else if (rate === 0) rec[b] = null;
+      else rec[b] = ceilTo(Math.max(0, c * safety - P[b]), mult);
+      used[b] = hol[b] ? 0 : (conf[b] !== null ? conf[b] : (past[b] ? 0 : (typeof rec[b] === 'number' ? rec[b] : 0)));
+    }
+    const open = [0], arrD = [0], close = [0], after = [0];
+    for (let d = 1; d <= 14; d++) {
+      let a = carry[d];
+      for (let b = 0; b < 6; b++) if (A[b] === d) a += used[b];
+      arrD[d] = a;
+      if (firstK === null || d < firstK) { open[d] = null; close[d] = null; after[d] = null; continue; }
+      open[d] = (d <= 6 && stockIn[d] !== null) ? stockIn[d] : close[d - 1];
+      const add = incDay(d) ? 0 : a;
+      close[d] = Math.max(0, open[d] + add - (use[d] || 0));
+      after[d] = open[d] + add;
+    }
+    let weekUse = 0; for (let d = 1; d <= 7; d++) weekUse += use[d];
+    let weekArr = 0; for (let d = 1; d <= 7; d++) weekArr += arrD[d]; if (monInc) { weekArr += arrD[8]; if (stockIn[1] !== null) weekArr -= arrD[1]; }
+    out[it.id] = { rate, off, hol, A, rec, used, conf, P, cov, NA, past, stockIn, use, after, arrD, weekUse, weekArr,
+      red: [1, 2, 3, 4, 5, 6].map(d => after[d] !== null && after[d] < (use[d] || 0) - 1e-9), hasMon: stockIn[1] !== null,
+      hasStock: firstK !== null, firstK, Kday };
+  }
+  return { sales, out };
+}
+if (false && typeof module !== 'undefined') module.exports = { computeWeek, addDays, mondayOf, itemRate, ceilTo };
+
+</script>
+<script>
+const TABS=[['order','발주','오늘'],['stock','재고','입력'],['sales','매출','수불'],['week','주간','현황'],['sum','정리','금액'],['set','설정','품목']];
+const DN=['월','화','수','목','금','토','일'];
+const S={openV:new Set(),openIt:new Set(),db:null,user:null,dl:null,canWrite:true,settings:{safety:1.2,monthSales:null,monInc:true},vendors:{},catalog:[],weeks:{},entries:{},
+  tab:'order',view:null,day:null,unsub:[],entUnsub:{},ready:{cfg:false,ven:false,cat:false,wk:false},pending:false};
+const todayId=(()=>{const d=new Date();const p=x=>String(x).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`})();
+const thisMon=mondayOf(new Date());
+S.view=thisMon;
+const dayIdxToday=(()=>{const w=(new Date().getDay()+6)%7;return w>5?0:w})();
+S.day=dayIdxToday;
+try{const t=localStorage.getItem('onse.tab');if(t&&TABS.some(x=>x[0]===t))S.tab=t}catch(e){}
+try{S.vf=localStorage.getItem('onse.vf')||'*'}catch(e){S.vf='*'}
+if(/iPhone|iPad|iPod/.test(navigator.userAgent))document.documentElement.classList.add('ios');
+function applyFz(){document.documentElement.style.setProperty('--fz',String(S.fz||1))}
+try{S.fz=Number(localStorage.getItem('onse.fz'))||1}catch(e){S.fz=1}
+applyFz();
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=(v,dp=1)=>v==null||v===''?'–':(Math.abs(v)<1e-9?'0':Number(v).toFixed(dp).replace(/\.0+$/,''));
+const won=v=>v==null?'–':Math.round(v).toLocaleString('ko-KR');
+const md=id=>{const [y,m,d]=id.split('-');return `${+m}/${+d}`};
+function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,1800)}
+function parseNum(s){s=String(s).replace(/[, ]/g,'');if(s==='')return null;const v=Number(s);return isNaN(v)?undefined:v}
+
+/* ---------- data ---------- */
+function activeItems(){return S.catalog.filter(i=>i.active!==false).sort((a,b)=>{
+  const va=S.vendors[a.vendorId]?.order??99, vb=S.vendors[b.vendorId]?.order??99;return va-vb||(a.order??999)-(b.order??999)})}
+function vGroup(v){return (v&&(v.group||v.name))||'(업체 없음)'}
+function groupsList(){const seen=[];Object.values(S.vendors).sort((a,b)=>(a.order??99)-(b.order??99)).forEach(v=>{const g=vGroup(v);if(!seen.includes(g))seen.push(g)});return seen}
+function isManual(it){return !!(S.vendors[it.vendorId]||{}).manual}
+function groupItems(){const f=S.vf;const all=activeItems();if(!f||f==='*'||!groupsList().includes(f))return all;return all.filter(it=>vGroup(S.vendors[it.vendorId])===f)}
+const CHO='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+function choOf(t){let o='';for(const ch of String(t||'')){const c=ch.charCodeAt(0);o+=(c>=0xAC00&&c<=0xD7A3)?CHO[Math.floor((c-0xAC00)/588)]:ch}return o}
+function norm(t){return String(t||'').toLowerCase().replace(/\s+/g,'')}
+function matchQ(it){const q=norm(S.q);if(!q)return true;const hay=norm((it.name||'')+' '+(it.code||'')+' '+(it.spec||''));
+  if(hay.includes(q))return true;if(/^[ㄱ-ㅎ]+$/.test(q))return choOf(norm(it.name)).includes(q);return false}
+function viewItems(){return groupItems().filter(matchQ)}
+function searchBox(){return ''}
+function noMatch(){return S.q?`<div class="card"><div class="empty">"${esc(S.q)}" 검색 결과가 없습니다.</div></div>`:''}
+function groupChips(){const gs=groupsList();if(gs.length<2)return '';const cur=gs.includes(S.vf)?S.vf:'*';
+  return `<div class="chips vf" role="tablist" aria-label="업체 묶음">${['*',...gs].map(g=>`<button class="chip" data-vf="${esc(g)}" aria-pressed="${cur===g}">${g==='*'?'전체':esc(g)}</button>`).join('')}</div>`}
+function calc(wid){return computeWeek({weekId:wid,todayId,settings:S.settings,vendors:S.vendors,items:activeItems(),weekDocs:S.weeks,entries:S.entries})}
+function subEntries(){
+  const want=new Set([addDays(S.view,-14),addDays(S.view,-7),S.view,addDays(S.view,7),...(S.extraWeeks||[])]);
+  for(const w of Object.keys(S.entUnsub)) if(!want.has(w)){S.entUnsub[w]();delete S.entUnsub[w]}
+  for(const w of want) if(!S.entUnsub[w]){
+    S.entUnsub[w]=S.db.collection(`weeks/${w}/items`).onSnapshot(snap=>{
+      const m={};snap.docs.forEach(d=>m[d.id]=d.data());S.entries[w]=m;schedule()},onErr)}
+}
+function onErr(e){console.warn(e);if(e&&e.code==='revoked'){$('#app').innerHTML='<div class="empty">접근 권한이 바뀌어 더 이상 불러올 수 없습니다.</div>'}}
+async function setEntry(wid,id,fn){
+  const cur=JSON.parse(JSON.stringify((S.entries[wid]||{})[id]||{}));fn(cur);
+  (S.entries[wid]=S.entries[wid]||{})[id]=cur;
+  try{await S.db.doc(`weeks/${wid}/items/${id}`).set(cur)}catch(e){writeFail(e)}
+}
+async function setWeek(wid,fn){
+  const cur=JSON.parse(JSON.stringify(S.weeks[wid]||{}));fn(cur);S.weeks[wid]=cur;
+  try{await S.db.doc(`weeks/${wid}`).set(cur)}catch(e){writeFail(e)}
+}
+async function setDoc(path,obj){try{await S.db.doc(path).set(obj)}catch(e){writeFail(e)}}
+function writeFail(e){if(e&&e.code==='invalid_argument'){S.canWrite=false;toast('보기 전용 권한이라 저장할 수 없습니다')}else toast('저장하지 못했습니다. 잠시 후 다시 시도해 주세요');schedule()}
+function arrSet(a,i,v){a=Array.isArray(a)?a.slice():[];while(a.length<=i)a.push(null);a[i]=v;return a}
+
+/* ---------- render ---------- */
+function schedule(){const ae=document.activeElement;if(ae&&ae.tagName==='INPUT'&&ae.type!=='file'){S.pending=true;return}render()}
+document.addEventListener('focusout',()=>setTimeout(()=>{if(S.pending){const ae=document.activeElement;if(!(ae&&ae.tagName==='INPUT')){S.pending=false;render()}}},50));
+function weekLabel(){const end=addDays(S.view,6);$('#wkLabel').textContent=`${md(S.view)}–${md(end)}`;$('#thisW').hidden=S.view===thisMon}
+function renderTabs(){$('#tabs').innerHTML=TABS.map(([k,a,b])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':''}><b>${a}</b>${b}</button>`).join('')}
+function dayChips(withDim){
+  return `<div class="chips" role="tablist">${[0,1,2,3,4,5].map(b=>{const id=addDays(S.view,b);
+    const dim=withDim&&!groupItems().some(it=>(S.vendors[it.vendorId]?.sched||[])[b]!=null);
+    return `<button class="chip ${dim?'dim':''}" data-day="${b}" aria-pressed="${S.day===b}">${DN[b]}${id===todayId?'·오늘':''}<span>${md(id)}</span></button>`}).join('')}</div>`}
+function render(){
+  weekLabel();renderTabs();
+  {const sb=$('#sbar');if(sb)sb.hidden=!['order','stock','week','set'].includes(S.tab)}
+  const ok=Object.values(S.ready).every(Boolean);
+  if(!S.db){return}
+  if(!ok){$('#app').innerHTML='<div class="empty">불러오는 중…</div>';return}
+  if(!S.catalog.length&&S.tab!=='set'){$('#app').innerHTML=`<div class="card"><div class="empty">아직 등록된 품목이 없습니다.<br>설정 탭에서 업체와 품목을 추가하세요.</div></div>`;return}
+  const v={order:vOrder,stock:vStock,sales:vSales,week:vWeek,sum:vSum,set:vSet}[S.tab]();
+  $('#app').innerHTML=v;
+}
+function vendorGroups(items){const g=[];let cur=null;for(const it of items){if(!cur||cur.v!==it.vendorId){cur={v:it.vendorId,items:[]};g.push(cur)}cur.items.push(it)}return g}
+
+/* 발주 */
+function vOrder(){
+  const b=S.day, R=calc(S.view), items=viewItems(), wd=addDays(S.view,b);
+  let html=groupChips()+searchBox()+dayChips(true);
+  if(S.q&&!items.length)return html+noMatch();
+  const anyStock=items.some(it=>R.out[it.id].Kday[b]!==null);
+  if(!anyStock) html+=`<div class="banner warn">${DN[b]}요일까지 입력된 재고가 없어서 추천 발주를 계산할 수 없습니다. 월요일이나 오늘 재고를 입력하세요.<button class="btn sm" data-go="stock" data-goday="${b}">재고 입력하기</button></div>`;
+  html+=`<h2>${md(wd)} (${DN[b]}) 발주</h2>`;
+  html+=`<div class="banner caution" role="note"><b>⚠ 추천 수량은 참고용입니다.</b> 이 앱에 입력해도 실제 발주는 들어가지 않습니다. 재고를 직접 확인하고, 발주는 반드시 영업시스템(업체)에 직접 넣으세요.</div>`;
+  const skipAt=html.length;
+  let totR=0,totC=0,any=false;const skipped=[];
+  for(const g of vendorGroups(items)){
+    const v=S.vendors[g.v]||{name:'(업체 없음)',sched:[]};const off=(v.sched||[])[b];
+    if(off==null||off===''){const days=[0,1,2,3,4,5].filter(x=>(v.sched||[])[x]!=null&&(v.sched||[])[x]!=='').map(x=>DN[x]).join(' ');skipped.push(`<span><b>${esc(v.name)}</b> ${days?days+' 발주':'발주일 미설정'}</span>`);continue} any=true;
+    const r0=R.out[g.items[0].id];const arrId=addDays(S.view,b+Number(off));
+    const hol=r0.hol[b];
+    html+=`<section class="card"><div class="hd"><span>${esc(v.name)}</span><span class="sub">${hol?'<span class="pill hol">휴무 · 발주 없음</span>':`${DN[(b+Number(off))%7]} ${md(arrId)} 입고`}</span></div>`;
+    for(const it of g.items){const o=R.out[it.id];const rec=o.rec[b];const conf=o.conf[b];
+      if(typeof rec==='number')totR+=rec*(it.price||0);
+      totC+=(conf??0)*(it.price||0);
+      const miss=!hol&&conf==null&&o.past[b];
+      const recHtml=hol?`<span class="rec2 hol">휴무</span>`:rec==null?`<span class="rec2 zero">${isManual(it)?'직접 판단':o.Kday[b]===null?'재고 필요':'사용량 없음'}</span>`:`<span class="rec2 ${rec===0?'zero':''}">추천 <b class="num">${fmt(rec,0)}</b></span>`;
+      const W7='월화수목금토일',dn=d=>W7[(d-1)%7],aD=o.A[b],nD=o.NA[b];const rng=nD?(nD-1>aD?`${dn(aD)}~${dn(nD-1)}`:dn(aD)):'';
+      const meta=hol?'':`<div class="ometa"><span>${aD?dn(aD)+' 입고 전(예상)':'입고 전(예상)'} <b class="num">${o.Kday[b]===null?'–':fmt(o.P[b])}</b></span>${nD?`<span>forecast <b class="num">${fmt(o.cov[b])}</b></span>`:''}${it.minStock!=null&&it.minStock!==''?`<span class="pill warn">최소 ${it.minStock}</span>`:''}${miss?'<span class="bad">미입력</span>':''}</div>`;
+      const mine=hol?'':`<div class="mine"><button class="step" data-step="${it.id}:-1" aria-label="${esc(it.name)} 발주 줄이기">−</button><input class="n ${miss?'miss':conf!=null?'set':''}" inputmode="decimal" aria-label="${esc(it.name)} 내 발주 수량" data-conf="${it.id}" value="${conf??''}"><button class="step" data-step="${it.id}:1" aria-label="${esc(it.name)} 발주 늘리기">+</button></div>`;
+      html+=`<div class="orow"><div class="ol"><div class="oname">${esc(it.name)}<small>${esc(it.spec||'')}${it.unit?' · '+esc(it.unit):''}${(it.mult||1)>1?` · ${it.mult}단위`:''}</small></div>${recHtml}</div>${hol?'':`<div class="ol">${meta}${mine}</div>`}</div>`;
+    }
+    html+=`</section>`;
+  }
+  if(!any) html+=`<div class="card"><div class="empty">${DN[b]}요일에 발주하는 업체가 없습니다.</div></div>`;
+  else html+=`<div class="card sum"><span>추천 금액 <b>${won(totR)}</b></span><span>내 발주 금액 <b>${won(totC)}</b></span></div>`;
+  if(skipped.length) html=html.slice(0,skipAt)+`<div class="card"><div class="meta" style="padding:10px 14px;font-size:calc(13px*var(--fz,1))"><span class="sub">${DN[b]}요일 발주 없음</span>${skipped.join('')}</div></div>`+html.slice(skipAt);
+  html+=`<p class="note">"내 발주"에는 실제로 발주할 수량을 넣으세요(− + 버튼은 발주 단위만큼 움직입니다). 비워두면 추천 수량대로 발주한다고 보고 계산하고, 날짜가 지난 발주일에 비어 있으면 0(발주 안 함)으로 계산합니다.</p>`;
+  return html;
+}
+/* 재고 */
+function vStock(){
+  const b=S.day,R=calc(S.view),items=viewItems(),wd=addDays(S.view,b);
+  let html=groupChips()+searchBox()+dayChips(false)+`<h2>${md(wd)} (${DN[b]}) ${b===0?'월요일 재고':'실재고'}</h2><p class="sub">${b===0?'월요일에 세면 한 주 전체 추천이 나옵니다. 못 셌으면 아무 요일이나 센 날 입력해도 그날부터 계산됩니다('+(S.settings.monInc?'그날 입고분 포함해서 센 재고':'입고 받기 전 재고')+').':'센 날만 입력하세요('+(S.settings.monInc?'그날 입고분 포함':'입고 받기 전')+'). 입력하면 이날 이후 추천은 이 재고 기준으로 다시 계산됩니다. 비워두면 예상 재고를 씁니다.'}</p>`;
+  if(S.q&&!items.length)return html+noMatch();
+  for(const g of vendorGroups(items)){const v=S.vendors[g.v]||{name:'(업체 없음)'};
+    html+=`<section class="card"><div class="hd"><span>${esc(v.name)}</span><span class="sub">재고 예상 = 오늘 입고까지 반영</span></div>`;
+    for(const it of g.items){const o=R.out[it.id];const val=o.stockIn[b+1];
+      const exp=b===0?null:(o.after[b]!=null?Math.max(0,o.after[b]-(o.use[b]||0)):null);
+      const red=o.red[b];
+      html+=`<div class="row"><div class="name">${esc(it.name)}<small>${esc(it.unit||'')}</small>
+        <div class="meta">${o.after[b+1]!=null?`<span>오늘 사용(예상) <b class="num">${fmt(o.use[b+1])}</b></span>`:''}${red?'<span class="bad">품절 위험</span>':''}</div></div>
+        <div class="ctrl">${o.after[b+1]!=null?`<span class="expv">매장 재고 예상<br>(입고후)<b class="num">${fmt(o.after[b+1])}</b></span>`:''}<input class="n ${val!=null?'set':(b===0?'miss':'')}" inputmode="decimal" aria-label="${esc(it.name)} 재고" data-stock="${it.id}" value="${val??''}"></div></div>`}
+    html+=`</section>`}
+  if(b===0){
+    const prevHas=Object.keys(S.entries[addDays(S.view,-7)]||{}).length>0;
+    html+=`<details class="card"><summary class="hd" style="cursor:pointer"><span>지난주 발주분 월·화 입고 (직접 입력)</span><span class="sub">${prevHas?'지난주 앱 기록에서 자동':'지난주 기록 없음'}</span></summary>
+      <p class="note" style="padding:8px 14px 0">지난주 확정 발주가 앱에 있으면 자동으로 잡힙니다. 앱을 처음 쓰는 주처럼 기록이 없을 때만 넣으세요. 넣은 값이 자동 값보다 우선합니다.</p>`;
+    for(const it of items){const e=(S.entries[S.view]||{})[it.id]||{};const a=e.arr||[];
+      html+=`<div class="row"><div class="name">${esc(it.name)}</div><div class="ctrl"><input class="n" inputmode="decimal" placeholder="월" aria-label="${esc(it.name)} 월 입고" data-arr="${it.id}:0" value="${a[0]??''}"><input class="n" inputmode="decimal" placeholder="화" aria-label="${esc(it.name)} 화 입고" data-arr="${it.id}:1" value="${a[1]??''}"></div></div>`}
+    html+=`</details>`}
+  return html;
+}
+/* 매출 */
+function vSales(){
+  const W=S.weeks[S.view]||{},NW=S.weeks[addDays(S.view,7)]||{},PW=S.weeks[addDays(S.view,-7)]||{};
+  const rows=(wid,doc,label,top='')=>`<section class="card">${top}<div class="hd"><span>${label}</span><span class="sub num">${won((doc.sales||[]).reduce((s,x)=>s+(Number(x)||0),0))}</span></div>`+
+    DN.map((d,i)=>`<div class="salesrow"><span>${d} <span class="sub num">${md(addDays(wid,i))}</span></span><input class="t" inputmode="numeric" data-sales="${wid}:${i}" aria-label="${md(addDays(wid,i))} 예상 매출" value="${(doc.sales||[])[i]!=null&&(doc.sales||[])[i]!==''?Number(doc.sales[i]).toLocaleString('ko-KR'):''}" placeholder="${wid!==S.view&&(W.sales||[])[i]?Number(W.sales[i]).toLocaleString('ko-KR'):'예상 매출'}"></div>`).join('')+`</section>`;
+  const st=S.settings;
+  const step=(n,t,when,use)=>`<div class="hd"><span><span class="pill warn">${n}</span> ${t}</span><span class="sub">${when}</span></div><p class="note" style="padding:8px 14px 0;margin:0">${use}</p>`;
+  const act=PW.actual!=null&&PW.actual!==''?Number(PW.actual).toLocaleString('ko-KR'):'';
+  const sm=st.monthSales!=null&&st.monthSales!==''?Number(st.monthSales).toLocaleString('ko-KR'):'';
+  const miss=(st.subulMissing||[]);
+  const subulStat=st.subulAt?`<div class="meta" style="padding:6px 14px 0"><span>마지막 반영 <b>${md(st.subulAt)}</b></span><span>${esc(st.subulFile||'')}</span><span>일치 <b class="num">${st.subulMatched??0}</b>개</span>${miss.length?`<span class="bad">못 찾음 ${miss.length}개: ${miss.map(esc).join(', ')}</span>`:''}</div>`:`<div class="meta" style="padding:6px 14px 0"><span class="bad">아직 수불현황을 올린 적이 없습니다</span></div>`;
+  const mWarn=!sm?`<p class="note bad" style="padding:4px 14px 0;margin:0">기준월 매출이 비어 있어서 추천 발주가 계산되지 않습니다.</p>`:'';
+  const nwHas=(NW.sales||[]).some(x=>x!=null&&x!=='');
+  return `<h2>매출 · 수불 입력</h2><p class="sub">매주 월요일 ①②, 매달 초 ③만 넣으면 됩니다.</p>`+
+    rows(S.view,W,`이번 주 (${md(S.view)}~)`,step('①','예상 매출','매주 월요일','추천 발주 계산에 씁니다.'))+
+    (()=>{const mk=periodOf('m').start.slice(0,7);const mp=(st.monthPlans||{})[mk];const [yy,mm]=mk.split('-').map(Number);
+      return `<section class="card">`+step('①-2',`${mm}월 예상 매출 (한 달 합계)`,'매달 초','정리 탭 "이번 달" 목표 금액과 발주율 계산에 씁니다. 비워두면 입력된 일별 예상 매출 합계를 씁니다.')+`<div class="salesrow"><span>${yy}년 ${mm}월</span><input class="t" inputmode="numeric" data-monthplan="${mk}" value="${mp!=null&&mp!==''?Number(mp).toLocaleString('ko-KR'):''}" placeholder="월 예상 매출" aria-label="${mm}월 예상 매출"></div></section>`})()+
+    `<details class="card" ${nwHas?'open':''} style="padding:0"><summary class="hd" style="cursor:pointer"><span>다음 주 예상 매출 <span class="sub">선택</span></span><span class="sub">${nwHas?'입력됨':'비우면 이번 주 값'}</span></summary>`+
+    rows(addDays(S.view,7),NW,'다음 주 요일별').replace('<section class="card">','<div>').replace(/<\/section>$/,'</div>')+`</details>`+
+    `<section class="card">`+step('②','지난주 실제 매출','매주 월요일','POS 월~일 합계. 주간 탭 "지난주 검증"에만 쓰이고 추천 발주에는 영향 없습니다.')+`<div class="salesrow"><span class="sub num">${md(addDays(S.view,-7))}~</span><input class="t" inputmode="numeric" data-actual="${addDays(S.view,-7)}" value="${act}" placeholder="실제 매출 합계" aria-label="지난주 실제 매출"></div></section>`+
+    `<section class="card">`+step('③','지난달 수불현황 + 그달 총매출','매달 초 1번','품목별 "100만원당 사용량"의 기준입니다. 반드시 <b>같은 달</b> 것끼리 넣으세요.')+
+    `<div style="padding:10px 14px 0;display:grid;gap:10px"><label class="btn" style="justify-content:center;text-align:center;cursor:pointer">수불현황 엑셀 올리기<input type="file" id="subul" accept=".xlsx,.xls" style="display:none"></label>`+
+    `<label class="field">수불현황 월<input class="t" type="month" data-submonth value="${st.subulMonth||prevMonthId()}"></label><label class="field">그달 총매출<input class="t num" inputmode="numeric" data-setting="monthSales" value="${sm}" placeholder="예) 264,989,781"></label></div>`+
+    subulStat+mWarn+`<div style="height:12px"></div></section>`;
+}
+/* 주간 */
+function vWeek(){
+  const R=calc(S.view),items=viewItems();const W=S.weeks[S.view]||{};
+  let html=groupChips()+searchBox()+`<h2>이번 주 현황</h2>`;
+  if(S.q&&!items.length)return html+noMatch();
+  let tot=0;
+  html+=`<section class="card"><div class="hd"><span>요일별 발주</span><span class="sub">굵게 = 확정 · 주황 = 추천</span></div><div class="tablewrap"><table class="wk"><thead><tr><th class="l">품목</th>${DN.slice(0,6).map((d,b)=>`<th>${d}<br><span class="sub num">${md(addDays(S.view,b))}</span></th>`).join('')}<th>주간 사용</th><th>발주 금액</th></tr></thead><tbody>`;
+  for(const it of items){const o=R.out[it.id];let amt=0;
+    html+=`<tr><td class="l">${esc(it.name)}</td>`+[0,1,2,3,4,5].map(b=>{
+      if(o.off[b]==null) return `<td class="off">·</td>`;
+      if(o.hol[b]) return `<td class="off">휴무</td>`;
+      const r=o.rec[b],c=o.conf[b];amt+=(c??(typeof r==='number'&&!o.past[b]?r:0))*(it.price||0);
+      return `<td class="num">${c!=null?`<span class="c">${fmt(c,1)}</span>`:typeof r==='number'?`<span class="r">${fmt(r,0)}</span>`:'–'}${o.red[b]?' <span class="pill bad">!</span>':''}</td>`}).join('')+
+      `<td class="num">${fmt(o.weekUse)}</td><td class="num">${won(amt)}</td></tr>`;tot+=amt}
+  html+=`</tbody></table></div><div class="sum"><span>이번 주 예상 발주 금액 <b>${won(tot)}</b></span></div></section>`;
+  // 지난주 검증
+  const PW=addDays(S.view,-7),PWd=S.weeks[PW]||{};const PR=calc(PW);const actual=Number(PWd.actual)||0;
+  html+=`<section class="card"><div class="hd"><span>지난주 검증 (${md(PW)}~)</span><span class="sub">실제 사용 vs 예상</span></div>`;
+  if(!actual) html+=`<div class="empty">매출 탭에서 지난주 실제 매출을 넣으면 품목별 오차가 나옵니다.</div>`;
+  else{let n=0;
+    for(const it of items){if(isManual(it))continue;const po=PR.out[it.id],co=R.out[it.id];
+      if(!po.hasMon||!co.hasMon) continue;n++;
+      const act=po.stockIn[1]+po.weekArr-co.stockIn[1];const exp=po.rate*actual/1e6;const diff=act-exp;const ratio=exp>0?diff/exp:null;
+      const judge=it.minStock!=null&&it.minStock!==''?['최소재고','hol']:exp===0?['기준 없음','hol']:(Math.abs(diff)<1||Math.abs(ratio)<=0.2)?['정상','ok']:diff>0?['많이 씀','bad']:['적게 씀','warn'];
+      html+=`<div class="row"><div class="name">${esc(it.name)}<div class="meta"><span>실제 <b class="num">${fmt(act)}</b></span><span>예상 <b class="num">${fmt(exp)}</b></span><span>실제 100만원당 <b class="num">${fmt(actual?act/actual*1e6:0,3)}</b></span></div></div><span class="pill ${judge[1]}">${judge[0]}${ratio!=null&&judge[1]!=='hol'?` ${ratio>0?'+':''}${Math.round(ratio*100)}%`:''}</span></div>`}
+    if(!n) html+=`<div class="empty">지난주와 이번 주 월요일 재고가 모두 있어야 계산됩니다.</div>`}
+  html+=`</section>`;
+  return html;
+}
+/* 정리: 발주 금액 목표 */
+function periodOf(kind){
+  const p2=x=>String(x).padStart(2,'0');
+  if(kind==='w'||kind==='pw'){const st=kind==='w'?S.view:addDays(S.view,-7);return {start:st,end:addDays(st,6),label:`${md(st)}~${md(addDays(st,6))} 주`,weekly:true}}
+  let [y,m]=S.view.split('-').map(Number);const d0=new Date(S.view+'T00:00:00');const thu=new Date(d0);thu.setDate(thu.getDate()+3);y=thu.getFullYear();m=thu.getMonth()+1;
+  if(kind==='pm'){m--;if(m<1){m=12;y--}}
+  const last=new Date(y,m,0).getDate();return {start:`${y}-${p2(m)}-01`,end:`${y}-${p2(m)}-${p2(last)}`,label:`${y}년 ${m}월`,weekly:false,days:last};
+}
+function vSum(){
+  const kind=S.sumP||'w';if(kind==='pm')return vSumSubul();const P=periodOf(kind);const items=activeItems();const tg=S.settings.targets||{},ta=S.settings.targetAmts||{};
+  const nDays=Math.round((new Date(P.end)-new Date(P.start))/864e5)+1;
+  // weeks covering the period
+  const weeks=[];for(let w=mondayOf(new Date(P.start+'T00:00:00'));w<=P.end;w=addDays(w,7))weeks.push(w);
+  const newW=weeks.filter(w=>!(S.extraWeeks||[]).includes(w));if(newW.length){S.extraWeeks=[...(S.extraWeeks||[]),...newW];setTimeout(subEntries,0)}
+  const need=weeks.filter(w=>S.entries[w]===undefined);
+  const gs=groupsList();const G={};gs.forEach(g=>G[g]={rec:0,conf:0,noStock:0});
+  let pSales=0;const rows=[];
+  for(const w of weeks){const R=calc(w);const W=S.weeks[w]||{};
+    for(let b=0;b<7;b++){const dt=addDays(w,b);if(dt<P.start||dt>P.end)continue;const sv=Number((W.sales||[])[b])||0;pSales+=sv;
+      const row={dt,b,sales:sv,rec:0,conf:0};
+      if(b<6)for(const it of items){const g=vGroup(S.vendors[it.vendorId]);if(!G[g])continue;const o=R.out[it.id];const pr=Number(it.price)||0;
+        if(o.off[b]==null||o.hol[b])continue;const r=o.rec[b],c=o.conf[b];
+        if(typeof r==='number'){G[g].rec+=r*pr;row.rec+=r*pr}
+        if(c){G[g].conf+=c*pr;row.conf+=c*pr}}
+      rows.push(row)}}
+  if(kind==='w'){for(const it of items){const g=vGroup(S.vendors[it.vendorId]);if(!G[g])continue;const o=calc(S.view).out[it.id];if(isManual(it))continue;
+    if([0,1,2,3,4,5].some(b=>o.off[b]!=null&&!o.hol[b]&&o.Kday[b]===null))G[g].noStock++}}
+  const mk=P.start.slice(0,7);const mPlan=kind==='m'?Number((S.settings.monthPlans||{})[mk])||0:0;const daySum=pSales;if(mPlan)pSales=mPlan;
+  const tval=g=>ta[g]!=null&&ta[g]!==''?Number(ta[g])*nDays/7:(Number(tg[g])||0)*pSales/100;
+  const pct=v=>pSales?`${(v/pSales*100).toFixed(1)}%`:'–';
+  const PK=[['w','이번 주'],['pw','전주'],['m','이번 달'],['pm','전달']];
+  let html=`<div class="chips vf">${PK.map(([k,l])=>`<button class="chip" data-sump="${k}" aria-pressed="${kind===k}">${l}</button>`).join('')}</div>`;
+  html+=`<h2>발주 금액 정리 · ${P.label}</h2><p class="sub">${md(P.start)}~${md(P.end)} · ${kind==='m'&&mPlan?'월':''} 예상 매출 <b class="num">${won(pSales)}</b>원 기준 · 부가세 별도${need.length?' · 불러오는 중…':''}</p>`;
+  if(kind==='m')html+=`<section class="card"><div class="salesrow"><span>${Number(mk.slice(5))}월 예상 매출<small class="sub" style="display:block">일별 입력 합계 ${won(daySum)}원</small></span><input class="t" inputmode="numeric" data-monthplan="${mk}" value="${mPlan?mPlan.toLocaleString('ko-KR'):''}" placeholder="월 예상 매출 입력" aria-label="월 예상 매출"></div></section>`;
+  if(!pSales) html+=`<div class="banner warn">이 기간 예상 매출이 없어서 목표를 %로 계산할 수 없습니다.${kind==='w'?'<button class="btn sm" data-go="sales">매출 입력하기</button>':''}</div>`;
+  // 목표 설정 (설정은 주 단위 기준)
+  const wSales=[0,1,2,3,4,5,6].reduce((a,i)=>a+(Number(((S.weeks[S.view]||{}).sales||[])[i])||0),0);
+  html+=`<details class="card" ${kind==='w'?'open':''} style="padding:0"><summary class="hd" style="cursor:pointer"><span>목표 발주 금액 설정</span><span class="sub">% 또는 주간 금액</span></summary>`+
+    gs.map(g=>{const useA=ta[g]!=null&&ta[g]!=='';const v=useA?Number(ta[g]):(Number(tg[g])||0)*wSales/100;const pv=useA?(wSales?Math.round(v/wSales*1000)/10:''):(tg[g]??'');
+      return `<div class="row"><div class="name">${esc(g)}<small>${useA?`주 <b class="num">${won(v)}원</b>`:tg[g]?`예상 매출의 <b>${tg[g]}%</b>`:'목표 없음'}</small></div>
+      <div class="ctrl tgc"><label><input class="n ${!useA&&tg[g]!=null&&tg[g]!==''?'set':''}" inputmode="decimal" data-target="${esc(g)}" value="${useA?'':(tg[g]??'')}" placeholder="${useA&&pv!==''?pv:''}" aria-label="${esc(g)} 목표 %"><span>%</span></label>
+      <label><input class="n w ${useA?'set':''}" inputmode="numeric" data-targetamt="${esc(g)}" value="${useA?Number(ta[g]).toLocaleString('ko-KR'):''}" placeholder="${!useA&&v?won(v):'주 금액'}" aria-label="${esc(g)} 주간 목표 금액"><span>원</span></label></div></div>`}).join('')+
+    `<p class="note" style="padding:0 14px 10px;margin:0">% 또는 금액 중 하나만 넣으세요(마지막에 넣은 쪽이 기준). 금액은 <b>한 주</b> 기준이고, 월로 볼 때는 날짜 수만큼 환산합니다.</p></details>`;
+  // 비교
+  let T={t:0,rec:0,conf:0};
+  html+=`<section class="card"><div class="hd"><span>목표 vs 추천 vs 내 발주</span><span class="sub">오른쪽 % = 예상 매출 대비</span></div>`;
+  for(const g of gs){const x=G[g];const t=tval(g);T.t+=t;T.rec+=x.rec;T.conf+=x.conf;
+    const mx=Math.max(t,x.rec,x.conf,1);const bar=(v,c)=>`<div class="sbar2"><i style="width:${Math.min(100,v/mx*100)}%;background:${c}"></i></div>`;
+    const diff=x.conf-t;const st=!t?'<span class="pill hol">목표 없음</span>':diff>0?`<span class="pill bad">${won(diff)}원 초과</span>`:`<span class="pill ok">${won(-diff)}원 남음</span>`;
+    html+=`<div class="vd"><div class="ol"><div class="name" style="flex:1">${esc(g)}</div>${st}</div>
+      <div class="sgrid"><span>목표</span>${bar(t,'var(--muted)')}<b class="num">${t?won(t):'–'}</b><small>${t?pct(t):''}</small>
+      <span>추천</span>${bar(x.rec,'var(--accent)')}<b class="num">${won(x.rec)}</b><small>${pct(x.rec)}</small>
+      <span>내 발주</span>${bar(x.conf,'var(--brand)')}<b class="num">${won(x.conf)}</b><small>${pct(x.conf)}</small></div>
+      ${x.noStock?`<p class="note" style="margin:4px 0 0">재고 미입력 ${x.noStock}개 품목은 추천 금액에서 빠져 있어요</p>`:''}</div>`}
+  const td=T.conf-T.t;
+  html+=`<div class="vd" style="background:var(--sunk)"><div class="ol"><div class="name" style="flex:1">전체</div>${T.t?(td>0?`<span class="pill bad">${won(td)}원 초과</span>`:`<span class="pill ok">${won(-td)}원 남음</span>`):''}</div>
+    <div class="sgrid"><span>목표</span><span></span><b class="num">${T.t?won(T.t):'–'}</b><small>${T.t?pct(T.t):''}</small><span>추천</span><span></span><b class="num">${won(T.rec)}</b><small>${pct(T.rec)}</small><span>내 발주</span><span></span><b class="num">${won(T.conf)}</b><small>${pct(T.conf)}</small></div></div></section>`;
+  // 기간별 표
+  let tbl;
+  if(P.weekly) tbl=rows.map(r=>`<span>${'월화수목금토일'[r.b]} <small>${md(r.dt)}</small></span><b class="num">${won(r.sales)}</b><b class="num">${r.b<6?won(r.rec):'–'}</b><b class="num">${r.b<6?won(r.conf):'–'}</b>`).join('');
+  else{const byW={};rows.forEach(r=>{const w=mondayOf(new Date(r.dt+'T00:00:00'));const x=byW[w]=byW[w]||{s:r.dt,e:r.dt,sales:0,rec:0,conf:0};x.e=r.dt;x.sales+=r.sales;x.rec+=r.rec;x.conf+=r.conf});
+    tbl=Object.values(byW).map(x=>`<span><small>${md(x.s)}~${md(x.e)}</small></span><b class="num">${won(x.sales)}</b><b class="num">${won(x.rec)}</b><b class="num">${won(x.conf)}</b>`).join('')}
+  html+=`<section class="card"><div class="hd"><span>${P.weekly?'요일별':'주별'} 금액</span><span class="sub">발주한 날 기준</span></div><div class="dtab"><span class="h">${P.weekly?'요일':'기간'}</span><span class="h">예상 매출</span><span class="h">추천</span><span class="h">내 발주</span>${tbl}
+    <span><b>합계</b></span><b class="num">${won(daySum)}</b><b class="num">${won(T.rec)}</b><b class="num">${won(T.conf)}</b></div></section>`;
+  html+=`<p class="note">추천 = 앱이 계산한 추천 수량 × 단가, 내 발주 = "내 발주"에 넣은 수량 × 단가. 이번 주/이번 달은 화면 위 ‹ › 로 고른 주 기준입니다. 소모품 업체는 내 발주만 잡힙니다.</p>`;
+  return html;
+}
+function vSumSubul(){
+  const st=S.settings,tg=st.targets||{},ta=st.targetAmts||{};const ms=Number(st.monthSales)||0;const mon=st.subulMonth||'';
+  const [yy,mm]=(mon||'0-0').split('-').map(Number);const days=yy?new Date(yy,mm,0).getDate():30;
+  const gs=groupsList();const G={};gs.forEach(g=>G[g]={inAmt:0,useAmt:0,n:0,items:[]});
+  for(const it of S.catalog){if(it.active===false)continue;const g=vGroup(S.vendors[it.vendorId]);if(!G[g]||!it.sub)continue;
+    G[g].inAmt+=Number(it.sub.inAmt)||0;G[g].useAmt+=Number(it.sub.useAmt)||0;G[g].n++;G[g].items.push(it)}
+  const pct=v=>ms?`${(v/ms*100).toFixed(1)}%`:'–';
+  const tval=g=>ta[g]!=null&&ta[g]!==''?Number(ta[g])*days/7:(Number(tg[g])||0)*ms/100;
+  const PK=[['w','이번 주'],['pw','전주'],['m','이번 달'],['pm','전달']];
+  let html=`<div class="chips vf">${PK.map(([k,l])=>`<button class="chip" data-sump="${k}" aria-pressed="${'pm'===k}">${l}</button>`).join('')}</div>`;
+  html+=`<h2>발주 금액 정리 · ${yy?`${yy}년 ${mm}월`:'전달'} (수불현황)</h2><p class="sub">수불현황 입고·사용 금액 / 그달 총매출 <b class="num">${won(ms)}</b>원 기준 · 부가세 별도</p>`;
+  const any=gs.some(g=>G[g].n);
+  if(!any||!ms){html+=`<div class="banner warn">${!any?'수불현황 입고 금액이 아직 없습니다. 매출·수불 탭 ③에서 수불현황 엑셀을 다시 올려주세요.':'그달 총매출이 비어 있습니다.'}<button class="btn sm" data-go="sales">매출·수불로 가기</button></div>`;if(!any)return html}
+  if(mon&&mon!==prevMonthId())html+=`<div class="banner warn">지금 들어 있는 수불현황은 ${mm}월 기준입니다. 지난달 것으로 바꾸려면 매출·수불 탭에서 다시 올려주세요.</div>`;
+  let T={t:0,inAmt:0,useAmt:0};
+  html+=`<section class="card"><div class="hd"><span>목표 vs 입고 vs 사용</span><span class="sub">오른쪽 % = 그달 매출 대비</span></div>`;
+  for(const g of gs){const x=G[g];const t=tval(g);T.t+=t;T.inAmt+=x.inAmt;T.useAmt+=x.useAmt;
+    const mx=Math.max(t,x.inAmt,x.useAmt,1);const bar=(v,c)=>`<div class="sbar2"><i style="width:${Math.min(100,v/mx*100)}%;background:${c}"></i></div>`;
+    const diff=x.inAmt-t;const stt=!t?'<span class="pill hol">목표 없음</span>':diff>0?`<span class="pill bad">${won(diff)}원 초과</span>`:`<span class="pill ok">${won(-diff)}원 남음</span>`;
+    const top=x.items.slice().sort((a,b)=>(b.sub.inAmt||0)-(a.sub.inAmt||0)).filter(it=>it.sub.inAmt||it.sub.useAmt);
+    html+=`<div class="vd"><div class="ol"><div class="name" style="flex:1">${esc(g)}</div>${stt}</div>
+      <div class="sgrid"><span>목표</span>${bar(t,'var(--muted)')}<b class="num">${t?won(t):'–'}</b><small>${t?pct(t):''}</small>
+      <span>입고</span>${bar(x.inAmt,'var(--brand)')}<b class="num">${won(x.inAmt)}</b><small>${pct(x.inAmt)}</small>
+      <span>사용</span>${bar(x.useAmt,'var(--accent)')}<b class="num">${won(x.useAmt)}</b><small>${pct(x.useAmt)}</small></div>
+      ${top.length?`<details style="margin-top:6px"><summary class="note" style="cursor:pointer">품목별 보기 (${top.length})</summary><div class="dtab" style="padding:6px 0 0"><span class="h">품목</span><span class="h">입고</span><span class="h">사용</span><span class="h">입고 수량</span>${top.map(it=>`<span style="font-size:calc(11px*var(--fz,1))">${esc(it.name)}</span><b class="num">${won(it.sub.inAmt)}</b><b class="num">${won(it.sub.useAmt)}</b><b class="num">${fmt(it.sub.inQty)}</b>`).join('')}</div></details>`:''}</div>`}
+  const td=T.inAmt-T.t;
+  html+=`<div class="vd" style="background:var(--sunk)"><div class="ol"><div class="name" style="flex:1">전체</div>${T.t?(td>0?`<span class="pill bad">${won(td)}원 초과</span>`:`<span class="pill ok">${won(-td)}원 남음</span>`):''}</div>
+    <div class="sgrid"><span>목표</span><span></span><b class="num">${T.t?won(T.t):'–'}</b><small>${T.t?pct(T.t):''}</small><span>입고</span><span></span><b class="num">${won(T.inAmt)}</b><small>${pct(T.inAmt)}</small><span>사용</span><span></span><b class="num">${won(T.useAmt)}</b><small>${pct(T.useAmt)}</small></div></div></section>`;
+  html+=`<p class="note">입고 = 수불현황 "일반입고" 금액(실제로 발주해서 들어온 금액), 사용 = "사용출고" 금액. 앱에 등록된 품목만 합산합니다. 금액 목표는 주 금액 × ${days}/7로 환산합니다.</p>`;
+  return html;
+}
+/* 업체 휴무 달력 */
+function holCalendar(vid){
+  const v=S.vendors[vid];if(!v)return '';
+  if(!S.holMonth) S.holMonth=S.view.slice(0,7);
+  const hd=new Set(v.holDates||[]);
+  const [y,m]=S.holMonth.split('-').map(Number);
+  const first=new Date(y,m-1,1),days=new Date(y,m,0).getDate();const lead=first.getDay();
+  const p=x=>String(x).padStart(2,'0');
+  let cells=['일','월','화','수','목','금','토'].map((d,i)=>`<div class="dh" ${i===0?'style="color:var(--danger)"':''}>${d}</div>`).join('')+'<div class="blank"></div>'.repeat(lead);
+  for(let d=1;d<=days;d++){const id=`${y}-${p(m)}-${p(d)}`;const dt=new Date(y,m-1,d);const wd=DN[(dt.getDay()+6)%7];
+    const auto=!!(v.nthWeek&&v.nthDay&&v.nthDay===wd&&Math.floor((d-1)/7)+1===Number(v.nthWeek));
+    const closed=hd.has(id);
+    cells+=`<button class="${closed?'closed':auto?'auto':''} ${id===todayId?'today':''}" data-holdate="${id}" data-holvid="${vid}" aria-pressed="${closed}" aria-label="${m}월 ${d}일 ${closed?'휴무':'영업'}">${d}<small>${closed?'휴무':auto?'정기':''}</small></button>`}
+  const list=[...hd].filter(x=>x.startsWith(S.holMonth)).sort().map(md).join(', ');
+  return `<div class="holbox"><div class="ol" style="padding:10px 0 0"><div class="name" style="flex:1">휴무 달력</div><span class="mnav"><button class="btn sm" data-hm="-1" aria-label="이전 달">‹</button><span class="num">${y}.${p(m)}</span><button class="btn sm" data-hm="1" aria-label="다음 달">›</button></span></div>
+    <p class="note" style="margin:4px 0 0">쉬는 날짜를 누르세요. 그날은 발주·입고가 없는 것으로 계산하고, 앞 발주일 추천이 그만큼 늘어납니다. 점선 = 정기 휴무.</p>
+    <div class="cal" style="padding:8px 0 4px">${cells}</div>${list?`<div class="note">이번 달 휴무 <b>${list}</b></div>`:''}</div>`;
+}
+/* 설정 */
+function vSet(){
+  const st=S.settings;let html=`<h2>설정</h2>`;
+  const FZ=[['0.8','아주 작게'],['0.9','작게'],['1','보통'],['1.1','크게']];
+  html+=`<section class="card"><div class="hd"><span>글자 크기</span><span class="sub">이 휴대폰에만 적용</span></div><div class="vd" style="border-top:0"><div class="chips">${FZ.map(([v,l])=>`<button class="chip" data-fz="${v}" aria-pressed="${String(S.fz)===v}" style="flex:1">${l}</button>`).join('')}</div></div></section>`;
+  html+=`<section class="card"><div class="hd"><span>기본 설정</span></div><div class="grid2">
+    <label class="field">안전 배수<input class="t num" inputmode="decimal" data-setting="safety" value="${st.safety??1.2}"></label>
+    <label class="field" style="grid-column:1/-1">입력하는 재고에 그날 입고분이 (모든 요일 공통)<select data-setting="monInc"><option value="1" ${st.monInc?'selected':''}>포함됨 (입고 후에 셈) · 기본</option><option value="0" ${!st.monInc?'selected':''}>포함 안 됨 (입고 전에 셈)</option></select></label>
+  </div></section>`;
+  // vendors
+  const vs=Object.values(S.vendors).sort((a,b)=>(a.order??99)-(b.order??99));
+  html+=`<section class="card"><div class="hd"><span>업체 · 발주 일정 · 휴무</span><button class="btn sm" data-addvendor>업체 추가</button></div><p class="note" style="padding:8px 14px 0">요일마다 "입고까지 일수"를 고르세요. 예) 월 발주 → 수 입고 = 2일. 발주 안 하는 요일은 "–".</p>`;
+  for(const v of vs){const sumS=[0,1,2,3,4,5].filter(b=>(v.sched||[])[b]!=null&&(v.sched||[])[b]!=='').map(b=>DN[b]).join(' ')||'발주일 없음';
+    html+=`<details class="vgrp" data-vg="s_${v.id}" ${S.openV.has('s_'+v.id)?'open':''}><summary><span class="name">${esc(v.name)}${v.manual?' <span class="pill hol">소모품</span>':''}</span><span class="sub">${v.group?esc(v.group)+' / ':''}${sumS}${(()=>{const mo=(S.holMonth||S.view.slice(0,7));const n=(v.holDates||[]).filter(x=>x.startsWith(mo)).length;return n?` · <span style="color:var(--danger)">휴무 ${n}일</span>`:''})()}</span><span class="chev" aria-hidden="true">›</span></summary><div class="vd" style="border-top:0"><div class="grid2" style="padding:0"><input class="t" data-vname="${v.id}" value="${esc(v.name)}" aria-label="업체명"><input class="t" data-vgroup="${v.id}" value="${esc(v.group||'')}" placeholder="묶음 (예: 음료·주류)" aria-label="묶음 이름"></div><div class="sched">${[0,1,2,3,4,5].map(b=>`<label>${DN[b]}<select data-vsched="${v.id}:${b}">${['','1','2','3','4'].map(o=>`<option value="${o}" ${String((v.sched||[])[b]??'')===o?'selected':''}>${o===''?'–':o+'일'}</option>`).join('')}</select></label>`).join('')}</div>
+    <div class="grid2" style="padding:0"><label class="field">정기 휴무 주차<select data-vnth="${v.id}:w"><option value="">없음</option>${[1,2,3,4,5].map(n=>`<option ${Number(v.nthWeek)===n?'selected':''}>${n}</option>`).join('')}</select></label><label class="field">정기 휴무 요일<select data-vnth="${v.id}:d"><option value="">없음</option>${DN.map(d=>`<option ${v.nthDay===d?'selected':''}>${d}</option>`).join('')}</select></label>
+    <label class="field" style="grid-column:1/-1">품목 종류<select data-vmanual="${v.id}"><option value="0" ${!v.manual?'selected':''}>식자재·음료 (수불현황으로 추천)</option><option value="1" ${v.manual?'selected':''}>소모품 (수불현황 안 씀 · 직접 판단)</option></select></label></div>${holCalendar(v.id)}</div></details>`}
+  html+=`</section>`;
+  // items
+  html+=searchBox()+`<section class="card"><div class="hd"><span>품목 (${activeItems().length}개 사용 중)</span><span class="sub">업체를 누르면 품목이 나옵니다</span></div>`;
+  const all=S.catalog.slice().sort((a,b)=>((S.vendors[a.vendorId]?.order??99)-(S.vendors[b.vendorId]?.order??99))||(a.order??999)-(b.order??999));
+  const grpIds=vs.map(v=>v.id);if(all.some(it=>!S.vendors[it.vendorId]))grpIds.push('_none');
+  let shown=0;for(const gid of grpIds){const gi=all.filter(it=>(gid==='_none'?!S.vendors[it.vendorId]:it.vendorId===gid)&&matchQ(it));const gv=S.vendors[gid];
+    if(S.q&&!gi.length)continue;shown+=gi.length;
+    const nOn=gi.filter(it=>it.active!==false).length;
+    html+=`<details class="vgrp" data-vg="${gid}" ${S.openV.has(gid)||S.q?'open':''}><summary><span class="name">${esc(gv?gv.name:'업체 미지정')}${gv&&gv.manual?' <span class="pill hol">소모품</span>':''}</span><span class="sub num">사용 ${nOn} / 전체 ${gi.length}</span><span class="chev" aria-hidden="true">›</span></summary>`;
+  for(const it of gi){const on=it.active!==false;const r=itemRate(it,st);
+    html+=`<details class="it ${on?'':'off'}" data-itd="${it.id}" ${S.openIt.has(it.id)?'open':''}><summary><span class="name">${esc(it.name||'(이름 없음)')}<small>${esc(S.vendors[it.vendorId]?.name||'업체 미지정')} · ${isManual(it)?(it.minStock!=null&&it.minStock!==''?`최소재고 ${it.minStock}`:'소모품'):`100만원당 ${fmt(r,3)}${r===0&&(it.minStock==null||it.minStock==='')?' <span class="pill bad">사용량 없음</span>':''}`}</small></span><button class="toggle ${on?'on':''}" data-active="${it.id}">${on?'사용':'제외'}</button></summary>
+      <div class="grid2" style="padding:10px 0 0">
+        ${[['name','품목명','t'],['code','품목코드','t'],['spec','규격','t'],['unit','단위','t'],['price','단가','n'],['mult','발주 단위','n'],['directRate','사용량 직접입력 (100만원당)','n'],['minStock','최소재고 (이하면 발주)','n'],['minQty','최소재고 발주 수량','n'],['order','표시 순서','n']].filter(([k])=>!(isManual(it)&&k==='directRate')).map(([k,l,t])=>`<label class="field">${l}<input class="t ${t==='n'?'num':''}" ${t==='n'?'inputmode="decimal"':''} data-item="${it.id}:${k}" value="${esc(it[k]??'')}"></label>`).join('')}
+        <label class="field">업체<select data-item="${it.id}:vendorId">${vs.map(v=>`<option value="${v.id}" ${it.vendorId===v.id?'selected':''}>${esc(v.name)}</option>`).join('')}</select></label>
+        ${isManual(it)?'':`<label class="field">지난달 사용량 (수불)<input class="t num" value="${it.monthUse??''}" data-item="${it.id}:monthUse" inputmode="decimal"></label>`}
+      </div></details>`}
+    if(gid!=='_none')html+=`<div class="it"><button class="btn sm" data-additem="${gid}">+ ${esc(gv.name)}에 품목 추가</button></div>`;
+    html+=`</details>`}
+  if(S.q&&!shown)html+=`<div class="empty">"${esc(S.q)}" 검색 결과가 없습니다.</div>`;
+  html+=`</section>`;
+  {const evs=vs.filter(v=>activeItems().some(it=>it.vendorId===v.id));
+  html+=`<section class="card"><div class="hd"><span>발주표 엑셀로 받기</span><span class="sub">${md(S.view)}~${md(addDays(S.view,5))} 주</span></div><div class="vd"><p class="note">"내 발주"에 넣은 수량과 실제 발주 금액(수량 × 단가)이 요일별로 나옵니다. 다른 주는 화면 위 ‹ › 로 바꾼 뒤 받으세요.</p>
+    <button class="btn pri" data-export="*" ${S.dl?'':'disabled'}>전체 받기 (요약 + 업체별 시트)</button>
+    <div class="chips" style="flex-wrap:wrap;margin-top:10px">${evs.map(v=>`<button class="chip" data-export="${v.id}" ${S.dl?'':'disabled'}>${esc(v.name)}</button>`).join('')}</div></div></section>`;}
+  {const gs=groupsList();
+  html+=`<section class="card" id="onsex"><div class="hd"><span>오토발주 엑셀 파일과 주고받기</span></div>
+    <div class="vd"><div class="name">엑셀 → 앱 (가져오기)</div><p class="note">오토발주 엑셀 파일(온세 / 음료·주류 / 한성물산, .xlsm·.xlsx)을 올리면 품목·업체·매출·그 주 재고와 내 발주·휴무·주간 기록을 읽어 옵니다. 미리보기를 확인하고 "앱에 반영"을 눌러야 저장됩니다. 엑셀에서 마지막으로 저장한 값 기준입니다.</p>
+    <input type="file" id="onseImp" accept=".xlsm,.xlsx" class="t" style="padding:6px"></div>
+    ${S.imp?impPreview():''}
+    <div class="vd"><div class="name">앱 → 엑셀 (내보내기)</div><p class="note">고른 묶음의 엑셀 파일과 같은 칸 위치로 만든 파일을 받습니다(지금 보고 있는 주 기준). 시트마다 맨 위에 붙여넣는 방법이 적혀 있습니다.</p>
+    <div class="chips" style="flex-wrap:wrap">${gs.map(g=>`<button class="chip" data-xlexp="${esc(g)}" ${S.dl?'':'disabled'}>${esc(g)} 형식</button>`).join('')}</div></div></section>`;}
+  return html;
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.hasAttribute('data-qclear')){S.q='';$('#q').value='';t.hidden=true;render();$('#q').focus();return}
+  if(t.dataset.sump){S.sumP=t.dataset.sump;render();return}
+  if(t.dataset.fz){S.fz=Number(t.dataset.fz);try{localStorage.setItem('onse.fz',String(S.fz))}catch(_){};applyFz();render();return}
+  if(t.dataset.vf!=null){S.vf=t.dataset.vf;try{localStorage.setItem('onse.vf',S.vf)}catch(_){};render();return}
+  if(t.dataset.tab){S.tab=t.dataset.tab;try{localStorage.setItem('onse.tab',S.tab)}catch(_){};render();window.scrollTo(0,0);return}
+  if(t.dataset.day){S.day=Number(t.dataset.day);render();return}
+  if(t.dataset.go){S.tab=t.dataset.go;S.day=Number(t.dataset.goday||0);render();return}
+  if(t.id==='prevW'){S.view=addDays(S.view,-7);subEntries();render();return}
+  if(t.id==='nextW'){S.view=addDays(S.view,7);subEntries();render();return}
+  if(t.id==='thisW'){S.view=thisMon;S.day=dayIdxToday;subEntries();render();return}
+  if(t.dataset.fillrec){const b=Number(t.dataset.fillrec);const R=calc(S.view);let n=0;
+    for(const it of viewItems()){const o=R.out[it.id];if(o.off[b]!=null&&!o.hol[b]&&o.conf[b]==null&&typeof o.rec[b]==='number'){n++;await setEntry(S.view,it.id,c=>{c.conf=arrSet(c.conf,b,o.rec[b])})}}
+    toast(n?`${n}개 품목 확정을 추천 수량으로 채웠습니다`:'채울 품목이 없습니다');render();return}
+  if(t.dataset.holv){S.holVendor=t.dataset.holv;render();return}
+  if(t.dataset.hm){const [y,m]=S.holMonth.split('-').map(Number);const d=new Date(y,m-1+Number(t.dataset.hm),1);S.holMonth=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;render();return}
+  if(t.dataset.holdate){const v=S.vendors[t.dataset.holvid||S.holVendor];const set=new Set(v.holDates||[]);const id=t.dataset.holdate;
+    set.has(id)?set.delete(id):set.add(id);
+    const keep=[...set].filter(x=>x>=addDays(todayId,-120)).sort();
+    S.vendors[v.id]=Object.assign({},v,{holDates:keep});render();
+    await setDoc(`vendors/${v.id}`,Object.assign({},v,{holDates:keep}));return}
+  if(t.dataset.step){const [id,dir]=t.dataset.step.split(':');const it=S.catalog.find(x=>x.id===id);const R=calc(S.view);const o=R.out[id];const b=S.day;
+    const m=Number(it.mult)||1;const base=o.conf[b]!=null?o.conf[b]:0;
+    const nv=Math.max(0,base+Number(dir)*m);
+    await setEntry(S.view,id,c=>{c.conf=arrSet(c.conf,b,nv)});render();return}
+  if(t.dataset.hol){const [vid,b]=t.dataset.hol.split(':');await setWeek(S.view,w=>{w.hol=w.hol||{};const a=(w.hol[vid]||[]).slice();while(a.length<6)a.push(false);a[+b]=!a[+b];w.hol[vid]=a});render();return}
+  if(t.dataset.active){e.preventDefault();const it=S.catalog.find(x=>x.id===t.dataset.active);await setDoc(`catalog/${it.id}`,Object.assign({},it,{active:it.active===false}));return}
+  if(t.hasAttribute('data-addvendor')){const id='v'+Date.now().toString(36);const order=Object.keys(S.vendors).length+1;S.openV.add('s_'+id);await setDoc(`vendors/${id}`,{id,name:'새 업체',sched:[null,null,null,null,null,null],order});toast('업체를 추가했습니다');return}
+  if(t.hasAttribute('data-additem')){const id='i'+Date.now().toString(36);const vid=t.dataset.additem||Object.values(S.vendors)[0]?.id||null;S.openV.add(vid);S.openIt.add(id);await setDoc(`catalog/${id}`,{id,name:'새 품목',vendorId:vid,active:true,mult:1,order:999});toast('업체 목록 맨 아래에 새 품목을 추가했습니다');return}
+  if(t.hasAttribute('data-export')){exportXlsx(t.dataset.export||'*');return}
+  if(t.dataset.xlexp!=null){exportXl(t.dataset.xlexp);return}
+  if(t.hasAttribute('data-impcancel')){S.imp=null;render();return}
+  if(t.hasAttribute('data-impgo')){t.disabled=true;await applyOnse();return}
+});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;$('.qx').hidden=!S.q;clearTimeout(S.qT);S.qT=setTimeout(render,120)}});
+document.addEventListener('toggle',e=>{const d=e.target;if(!d||!d.dataset)return;if(d.dataset.vg){d.open?S.openV.add(d.dataset.vg):S.openV.delete(d.dataset.vg)}if(d.dataset.itd){d.open?S.openIt.add(d.dataset.itd):S.openIt.delete(d.dataset.itd)}},true);
+document.addEventListener('change',async e=>{
+  const t=e.target;const ds=t.dataset;
+  if(ds.conf){const v=parseNum(t.value);if(v===undefined){toast('숫자만 입력하세요');return}await setEntry(S.view,ds.conf,c=>{c.conf=arrSet(c.conf,S.day,v)});return}
+  if(ds.stock){const v=parseNum(t.value);if(v===undefined){toast('숫자만 입력하세요');return}await setEntry(S.view,ds.stock,c=>{c.stock=arrSet(c.stock,S.day,v)});return}
+  if(ds.arr){const [id,i]=ds.arr.split(':');const v=parseNum(t.value);if(v===undefined)return;await setEntry(S.view,id,c=>{c.arr=arrSet(c.arr,+i,v)});return}
+  if(ds.sales){const [wid,i]=ds.sales.split(':');const v=parseNum(t.value);if(v===undefined){toast('숫자만 입력하세요');return}await setWeek(wid,w=>{w.sales=arrSet(w.sales,+i,v)});t.value=v==null?'':v.toLocaleString('ko-KR');return}
+  if(ds.actual){const v=parseNum(t.value);if(v===undefined)return;await setWeek(ds.actual,w=>{w.actual=v});return}
+  if(ds.setting){let v=t.value;if(ds.setting==='monInc')v=v==='1';else{v=parseNum(v);if(v===undefined)return}
+    await setDoc('config/main',Object.assign({},S.settings,{[ds.setting]:v}));return}
+  if(t.hasAttribute('data-impsched')){if(S.imp)S.imp.setSched=t.checked;return}
+  if(ds.target!=null||ds.targetamt!=null){const g=ds.target??ds.targetamt;const v=parseNum(t.value);if(v===undefined){toast('숫자만 입력하세요');return}
+    const tg=Object.assign({},S.settings.targets||{}),ta=Object.assign({},S.settings.targetAmts||{});
+    if(ds.target!=null){if(v==null)delete tg[g];else{tg[g]=v;delete ta[g]}}else{if(v==null)delete ta[g];else{ta[g]=v;delete tg[g]}}
+    await setDoc('config/main',Object.assign({},S.settings,{targets:tg,targetAmts:ta}));return}
+  if(t.hasAttribute('data-submonth')){if(!t.value)return;await setDoc('config/main',Object.assign({},S.settings,{subulMonth:t.value}));return}
+  if(ds.monthplan){const v=parseNum(t.value);if(v===undefined){toast('숫자만 입력하세요');return}const mp=Object.assign({},S.settings.monthPlans||{});if(v==null)delete mp[ds.monthplan];else mp[ds.monthplan]=v;await setDoc('config/main',Object.assign({},S.settings,{monthPlans:mp}));if(v!=null)t.value=v.toLocaleString('ko-KR');return}
+  if(ds.vmanual){const v=S.vendors[ds.vmanual];await setDoc(`vendors/${v.id}`,Object.assign({},v,{manual:t.value==='1'}));return}
+  if(ds.vgroup){const v=S.vendors[ds.vgroup];await setDoc(`vendors/${v.id}`,Object.assign({},v,{group:t.value.trim()||null}));return}
+  if(ds.vname){const v=S.vendors[ds.vname];await setDoc(`vendors/${v.id}`,Object.assign({},v,{name:t.value.trim()||v.name}));return}
+  if(ds.vsched){const [vid,b]=ds.vsched.split(':');const v=S.vendors[vid];const s=(v.sched||[]).slice();while(s.length<6)s.push(null);s[+b]=t.value===''?null:Number(t.value);await setDoc(`vendors/${vid}`,Object.assign({},v,{sched:s}));return}
+  if(ds.vnth){const [vid,k]=ds.vnth.split(':');const v=S.vendors[vid];await setDoc(`vendors/${vid}`,Object.assign({},v,k==='w'?{nthWeek:t.value?Number(t.value):null}:{nthDay:t.value||null}));return}
+  if(ds.item){const [id,k]=ds.item.split(':');const it=S.catalog.find(x=>x.id===id);let v=t.value;
+    if(['price','mult','directRate','minStock','minQty','order','monthUse'].includes(k)){v=parseNum(v);if(v===undefined){toast('숫자만 입력하세요');return}}
+    if(k==='code'){v=v.trim()}
+    await setDoc(`catalog/${id}`,Object.assign({},it,{[k]:v}));return}
+  if(t.id==='subul'&&t.files[0]){importSubul(t.files[0]);t.value=''}
+  if(t.id==='onseImp'&&t.files[0]){readOnse(t.files[0]);t.value=''}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.target.blur()}});
+
+function prevMonthId(){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+async function importSubul(file){
+  if(!window.XLSX){toast('엑셀 읽기 도구를 불러오지 못했습니다');return}
+  try{const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+    let map=null;const N=v=>Number(v)||0;
+    const norm=v=>String(v==null?'':v).replace(/\s/g,'');
+    const names=wb.SheetNames.slice().sort((x,y)=>(norm(y).includes('수불')?1:0)-(norm(x).includes('수불')?1:0));
+    for(const name of names){const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,raw:true,defval:null});
+      let hi=-1,cc=-1;for(let i=0;i<Math.min(rows.length,40)&&hi<0;i++){const r=rows[i]||[];for(let j=0;j<r.length;j++)if(norm(r[j])==='품목코드'||norm(r[j])==='상품코드'){hi=i;cc=j;break}}
+      if(hi<0)continue;
+      // 헤더 두 줄(구분/수량·금액)에서 열 찾기, 못 찾으면 표준 위치(품목코드 기준 오프셋)
+      const h1=(rows[hi]||[]).map(norm),h2=(rows[hi+1]||[]).map(norm);
+      const grp=k=>{let last='';const out=[];for(let j=0;j<Math.max(h1.length,h2.length);j++){if(h1[j])last=h1[j];out[j]=last}return out.findIndex((x,j)=>x.includes(k)&&(h2[j]==='수량'||h2[j]===''))};
+      const col=(k,off)=>{const j=grp(k);return j>=0?j:cc+off};
+      const cUse=col('사용출고',15),cIn=col('일반입고',7),cTin=col('이체입고',9),cTout=col('이체출고',11);
+      const isAmt=j=>h2[j+1]==='금액';
+      map={};let cnt=0;
+      for(const r of rows.slice(hi+1)){const c=r&&r[cc];if(c==null||c===''||!/^\d+$/.test(String(c).trim()))continue;cnt++;
+        map[String(c).trim()]={use:N(r[cUse]),useAmt:isAmt(cUse)||cUse===cc+15?N(r[cUse+1]):0,inQty:N(r[cIn]),inAmt:isAmt(cIn)||cIn===cc+7?N(r[cIn+1]):0,tIn:N(r[cTin+1]),tOut:N(r[cTout+1])}}
+      if(cnt)break;map=null}
+    if(!map){toast('수불현황에서 "품목코드" 칸을 찾지 못했습니다. 영업시스템 수불현황 엑셀인지 확인해 주세요');return}
+    const mon=S.settings.subulMonth||prevMonthId();
+    let n=0;const missing=[];
+    for(const it of S.catalog){const c=String(it.code||'').trim();const m=c&&map[c];
+      if(m){n++;const d=Object.assign({},it,{sub:{month:mon,inQty:m.inQty,inAmt:m.inAmt,useAmt:m.useAmt,tIn:m.tIn,tOut:m.tOut,use:m.use}});if(!isManual(it))d.monthUse=m.use;await setDoc(`catalog/${it.id}`,d)}
+      else{if(it.sub){const d=Object.assign({},it);delete d.sub;await setDoc(`catalog/${it.id}`,d)}
+        if(!isManual(it)&&it.active!==false&&(it.directRate==null||it.directRate==='')&&(it.minStock==null||it.minStock===''))missing.push(it.name||it.code||'')}}
+    await setDoc('config/main',Object.assign({},S.settings,{subulAt:todayId,subulFile:file.name,subulMatched:n,subulMissing:missing,subulMonth:mon}));
+    toast(`${n}개 품목 사용량·입고 금액 갱신 · 그달 총매출도 확인하세요`);
+  }catch(err){console.warn(err);toast('파일을 읽지 못했습니다')}
+}
+function vendorSheet(v,R,items){
+  const wk=S.view, days=[0,1,2,3,4,5], sched=v.sched||[];
+  const title=`${v.name} 발주표 · ${md(wk)}(월) ~ ${md(addDays(wk,5))}(토)`;
+  const head=['품목코드','품목명','규격','단위','단가'];
+  days.forEach(b=>head.push(`${DN[b]} ${md(addDays(wk,b))}`));head.push('수량 합계','발주 금액');
+  const arrRow=['','입고일','','',''];
+  const r0=items.length?R.out[items[0].id]:null;
+  days.forEach(b=>{const o=sched[b];if(o==null||o===''){arrRow.push('발주 없음');return}
+    if(r0&&r0.hol[b]){arrRow.push('휴무');return}const ad=addDays(wk,b+Number(o));const dt=new Date(ad+'T00:00:00');arrRow.push(`${'월화수목금토일'[(dt.getDay()+6)%7]} ${md(ad)} 입고`)});
+  arrRow.push('','');
+  const rows=[[title],[`받은 날 ${todayId} · 금액 = 내 발주 수량 × 단가 (부가세 별도) · ※ 참고용 자료입니다. 실제 발주는 영업시스템에 직접 넣으세요.`],head,arrRow];
+  const dayAmt=days.map(()=>0);let tot=0,totQ=0;
+  for(const it of items){const o=R.out[it.id];const pr=Number(it.price)||0;let q=0,amt=0;
+    const r=[Number(it.code)||it.code||'',it.name||'',it.spec||'',it.unit||'',pr];
+    for(const b of days){if(o.off[b]==null){r.push('');continue}if(o.hol[b]){r.push('휴무');continue}
+      const c=o.conf[b];r.push(c==null||c===0?'':c);if(c){q+=c;amt+=c*pr;dayAmt[b]+=c*pr}}
+    r.push(q||'',amt?Math.round(amt):'');tot+=amt;totQ+=q;rows.push(r)}
+  rows.push([]);
+  rows.push(['','요일별 발주 금액','','',''].concat(days.map(b=>dayAmt[b]?Math.round(dayAmt[b]):'')).concat(['',Math.round(tot)]));
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:11},{wch:30},{wch:16},{wch:6},{wch:9}].concat(Array(6).fill({wch:11})).concat([{wch:9},{wch:12}]);
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:12}},{s:{r:1,c:0},e:{r:1,c:12}}];
+  const lastR=rows.length-1;
+  for(const k of Object.keys(ws)){if(k[0]==='!')continue;const a=XLSX.utils.decode_cell(k);if(typeof ws[k].v==='number'&&(a.c===4||a.c===12||a.r===lastR))ws[k].z='#,##0'}
+  return {ws,dayAmt,tot};
+}
+function sheetName(n,used){let b=String(n).replace(/[\\\/\?\*\[\]:]/g,'').slice(0,28)||'업체';let x=b,i=2;while(used.has(x))x=b+'_'+(i++);used.add(x);return x}
+async function exportXlsx(which){
+  if(!window.XLSX||!S.dl){toast('이 화면에서는 파일 받기를 쓸 수 없습니다');return}
+  const R=calc(S.view),all=activeItems();
+  const vs=Object.values(S.vendors).sort((a,b)=>(a.order??99)-(b.order??99)).filter(v=>all.some(it=>it.vendorId===v.id));
+  const pick=which==='*'?vs:vs.filter(v=>v.id===which);
+  if(!pick.length){toast('받을 업체가 없습니다');return}
+  const wb=XLSX.utils.book_new();const used=new Set();const sum=[];const sheets=[];
+  for(const v of pick){const {ws,dayAmt,tot}=vendorSheet(v,R,all.filter(it=>it.vendorId===v.id));sum.push([v.name].concat(dayAmt.map(x=>x?Math.round(x):'')).concat([Math.round(tot)]));sheets.push([v.name,ws])}
+  if(which==='*'){
+    const head=['업체'].concat([0,1,2,3,4,5].map(b=>`${DN[b]} ${md(addDays(S.view,b))}`)).concat(['주간 합계']);
+    const totals=[0,1,2,3,4,5,6].map(i=>sum.reduce((s,r)=>s+(Number(r[i+1])||0),0));
+    const rows=[[`발주 금액 요약 · ${md(S.view)}(월) ~ ${md(addDays(S.view,5))}(토)`],[`받은 날 ${todayId} · 내 발주 수량 × 단가 (부가세 별도)`],head].concat(sum).concat([[],['합계'].concat(totals.map(x=>x?Math.round(x):''))]);
+    const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:22}].concat(Array(7).fill({wch:12}));
+    Object.keys(ws).forEach(k=>{if(k[0]!=='!'&&typeof ws[k].v==='number')ws[k].z='#,##0'});
+    XLSX.utils.book_append_sheet(wb,ws,sheetName('요약',used))}
+  for(const [n,ws] of sheets)XLSX.utils.book_append_sheet(wb,ws,sheetName(n,used));
+  const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  const fname=which==='*'?`발주표_전체_${S.view}.xlsx`:`발주표_${String(pick[0].name).replace(/[\\\/\?\*\[\]:㈜()]/g,'')}_${S.view}.xlsx`;
+  try{await S.dl.save({filename:fname,data:new Uint8Array(buf)});toast('파일을 저장했습니다')}
+  catch(e){if(e&&e.code==='declined')return;toast('파일을 저장하지 못했습니다')}
+}
+
+/* ---------- 온세 엑셀 연동 ---------- */
+const BLK=['K','O','S','W','AA','AE'],CONFC=['N','R','V','Z','AD','AH'];
+function serialToId(v){if(typeof v!=='number')return null;const c=XLSX.SSF.parse_date_code(v);if(!c)return null;const p=x=>String(x).padStart(2,'0');return `${c.y}-${p(c.m)}-${p(c.d)}`}
+function cv(ws,a){const c=ws&&ws[a];return c?c.v:undefined}
+function nn(v){if(v===undefined||v===null||v==='')return null;const n=Number(v);return isNaN(n)?null:n}
+const vnorm=t=>String(t||'').replace(/\s|㈜|\(주\)|\(유\)|주식회사|유한회사/g,'').toLowerCase();
+function findVendor(name){const n=vnorm(name);if(!n)return null;return Object.values(S.vendors).find(v=>vnorm(v.name)===n)||null}
+async function readOnse(file){
+  if(!window.XLSX){toast('엑셀 읽기 도구를 불러오지 못했습니다');return}
+  let wb;try{wb=XLSX.read(await file.arrayBuffer(),{type:'array'})}catch(e){toast('파일을 읽지 못했습니다');return}
+  const O=wb.Sheets['오토발주'];if(!O){toast('오토발주 시트가 없습니다. 오토발주 엑셀 파일인지 확인하세요');return}
+  const VS=wb.Sheets['업체 설정'];const gen=!!VS;
+  const title=String(cv(O,'A1')||'').replace(/^오토발주\s*/,'').replace(/\s*\(.*\)\s*$/,'').trim();
+  const imp={file:file.name,gen,title:gen?(title||'새 묶음'):'온세',weekId:serialToId(cv(O,'C3')),safety:nn(cv(O,'C4')),items:[],entries:[],vendors:[],sales:[],next:[],monthSales:null,subul:{},log:{},actual:{},setSched:false};
+  if(!imp.weekId){toast('주 시작일(C3)을 읽지 못했습니다');return}
+  if(gen){for(let r=5;r<=30;r++){const name=cv(VS,'B'+r);if(name==null||name==='')continue;
+      const sched=['C','D','E','F','G','H'].map(c=>nn(cv(VS,c+r)));
+      imp.vendors.push({name:String(name).trim(),sched,nthWeek:nn(cv(VS,'I'+r)),nthDay:cv(VS,'J'+r)||null,hol:['M','N','O','P','Q','R'].map(c=>cv(VS,c+r)==='휴무')})}}
+  else imp.vendors.push({name:(S.vendors.onse||{}).name||'온세물류',onse:true,hol:BLK.map(col=>cv(O,col+'6')==='휴무')});
+  const M=wb.Sheets['품목 관리'];
+  if(M){for(let r=5;r<=200;r++){
+      const g=gen?{vn:cv(M,'C'+r),code:cv(M,'D'+r),name:cv(M,'E'+r),spec:cv(M,'F'+r),unit:cv(M,'G'+r),price:cv(M,'H'+r),mult:cv(M,'I'+r),dr:cv(M,'J'+r),ms:cv(M,'K'+r),mq:cv(M,'L'+r)}
+                 :{vn:null,code:cv(M,'C'+r),name:cv(M,'D'+r),spec:cv(M,'E'+r),unit:cv(M,'F'+r),price:cv(M,'G'+r),mult:cv(M,'H'+r),dr:cv(M,'I'+r),ms:cv(M,'J'+r),mq:cv(M,'K'+r)};
+      if(g.code==null||g.code==='')continue;
+      imp.items.push({vn:g.vn?String(g.vn).trim():imp.vendors[0].name,code:String(g.code).trim(),active:String(cv(M,'B'+r)||'').toUpperCase()==='O',name:g.name||'',spec:g.spec||'',unit:g.unit||'',price:nn(g.price),mult:nn(g.mult)||1,directRate:nn(g.dr),minStock:nn(g.ms),minQty:nn(g.mq)})}}
+  for(let r=9;r<=90;r++){const code=cv(O,'A'+r);if(typeof code!=='number'&&!(typeof code==='string'&&/^\d+$/.test(code)))continue;const c=String(code);
+    const vn=gen?String(cv(O,'C'+r)||'').trim():imp.vendors[0].name;
+    if(!M) imp.items.push({vn,code:c,active:true,name:cv(O,'B'+r)||'',spec:'',unit:cv(O,'D'+r)||'',price:nn(cv(O,'E'+r)),mult:nn(cv(O,'F'+r))||1,directRate:nn(cv(O,'G'+r)),minStock:nn(cv(O,'AL'+r)),minQty:nn(cv(O,'AM'+r))});
+    const e={vn,code:c,stock:BLK.map(col=>nn(cv(O,col+r))),conf:CONFC.map(col=>nn(cv(O,col+r))),arr:[nn(cv(O,'I'+r)),nn(cv(O,'J'+r))]};
+    if(e.stock.some(x=>x!=null)||e.conf.some(x=>x!=null)||e.arr.some(x=>x))imp.entries.push(e)}
+  const SA=wb.Sheets['매출 입력'];
+  if(SA){imp.monthSales=nn(cv(SA,'D4'));for(let k=0;k<7;k++)imp.sales[k]=nn(cv(SA,'E'+(7+k)));for(let k=0;k<7;k++)imp.next[k]=nn(cv(SA,'E'+(14+k)))}
+  const SB=wb.Sheets['수불현황'];
+  if(SB){const rows=XLSX.utils.sheet_to_json(SB,{header:1,raw:true});for(const r of rows){if(r&&r[3]!=null&&/^\d+$/.test(String(r[3]).trim()))imp.subul[String(r[3]).trim()]=Number(r[18])||0}}
+  const LG=wb.Sheets['주간 기록'];
+  if(LG){for(let r=5;r<=3000;r++){const w=serialToId(cv(LG,'A'+r)),code=cv(LG,'B'+r);
+      if(w&&code!=null&&w!==imp.weekId){const s=nn(cv(LG,'D'+r));if(s!=null)(imp.log[w]=imp.log[w]||{})[String(code)]=s}
+      const ow=serialToId(cv(LG,'O'+r));if(ow){const a=nn(cv(LG,'Q'+r));if(a!=null)imp.actual[ow]=a}
+      if(!w&&!ow&&r>40&&cv(LG,'A'+r)==null&&cv(LG,'O'+r)==null)break}}
+  S.imp=imp;render();setTimeout(()=>document.getElementById('onsex')?.scrollIntoView({block:'start'}),50);
+}
+function impVendorId(i,vn){const v=findVendor(vn);if(v)return v.id;if(!i.gen&&S.vendors.onse)return 'onse';return null}
+function impPreview(){const i=S.imp;
+  const vrows=i.vendors.map(v=>{const ex=i.gen?findVendor(v.name):(S.vendors.onse||findVendor(v.name));return `<span><b>${esc(v.name)}</b> ${ex?'':'<span class="pill warn">새 업체</span>'}</span>`}).join('');
+  const nNew=i.items.filter(x=>!findItem(x.code,impVendorId(i,x.vn))).length;
+  return `<div class="vd" style="background:var(--sunk)"><div class="name">미리보기 · ${esc(i.file)}</div>
+    <div class="meta" style="font-size:calc(13px*var(--fz,1));color:var(--ink)"><span>형식 <b>${i.gen?'여러 업체 ('+esc(i.title)+')':'온세'}</b></span><span>주 시작일 <b class="num">${i.weekId}</b></span>
+    <span>품목 <b class="num">${i.items.length}</b>개 (사용 ${i.items.filter(x=>x.active).length}, 새 품목 ${nNew})</span><span>재고·내 발주 입력된 품목 <b class="num">${i.entries.length}</b></span>
+    <span>매출 <b class="num">${i.sales.filter(x=>x!=null).length}</b>일</span><span>수불현황 <b class="num">${Object.keys(i.subul).length}</b>개 코드</span><span>주간 기록 <b class="num">${Object.keys(i.log).length}</b>주</span></div>
+    <div class="meta" style="font-size:calc(13px*var(--fz,1));color:var(--ink);margin-top:6px">${vrows}</div>
+    ${i.gen?`<label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:calc(13px*var(--fz,1))"><input type="checkbox" data-impsched ${i.setSched?'checked':''}> 업체 발주 요일·정기휴무도 엑셀대로 바꾸기 (체크 안 하면 앱 설정 유지)</label>`:''}
+    <p class="note">반영하면 같은 업체·품목코드의 품목 정보와 이 주(${md(i.weekId)}~)의 재고·내 발주·매출·휴무가 엑셀 값으로 바뀝니다. 앱에만 있는 품목은 그대로 둡니다.</p>
+    <div class="ctrl"><button class="btn pri" data-impgo>앱에 반영</button><button class="btn" data-impcancel>취소</button></div></div>`}
+function findItem(code,vid){code=String(code||'').trim();if(!code)return null;
+  const same=S.catalog.filter(x=>String(x.code||'').trim()===code);
+  return (vid&&same.find(x=>x.vendorId===vid))||(same.length===1&&(!vid||!S.vendors[same[0].vendorId])?same[0]:null)||(!vid&&same[0])||null}
+async function applyOnse(){
+  const i=S.imp;toast('반영하는 중…');
+  // vendors
+  const vmap={};let vo=Object.keys(S.vendors).length;
+  for(const v of i.vendors){let ex=v.onse?(S.vendors.onse||findVendor(v.name)):findVendor(v.name);
+    if(!ex){const id='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);ex={id,name:v.name,sched:v.sched||[null,null,null,null,null,null],nthWeek:v.nthWeek??null,nthDay:v.nthDay??null,order:++vo,group:i.gen?i.title:null,holDates:[]};await setDoc(`vendors/${id}`,ex)}
+    else if(i.gen&&i.setSched){ex=Object.assign({},ex,{sched:v.sched,nthWeek:v.nthWeek??null,nthDay:v.nthDay??null});await setDoc(`vendors/${ex.id}`,ex)}
+    vmap[vnorm(v.name)]=ex.id;v.id=ex.id}
+  const vidOf=vn=>vmap[vnorm(vn)]||impVendorId(i,vn)||i.vendors[0].id;
+  await setDoc('config/main',Object.assign({},S.settings,{safety:i.safety??S.settings.safety,monInc:S.settings.monInc,monthSales:i.monthSales??S.settings.monthSales}));
+  const kOf={};const idOf={};
+  for(const it of i.items){const vid=vidOf(it.vn);kOf[vid]=(kOf[vid]||0)+1;const ex=findItem(it.code,vid);
+    let id=ex?ex.id:it.code;if(!ex&&S.catalog.some(x=>x.id===id))id=it.code+'-'+vid;
+    const d=Object.assign({},ex||{id,vendorId:vid},{code:it.code,name:it.name,spec:it.spec,unit:it.unit,price:it.price,mult:it.mult,directRate:it.directRate,minStock:it.minStock,minQty:it.minQty,active:it.active,order:kOf[vid]});
+    if(it.code in i.subul&&!(S.vendors[vid]||{}).manual)d.monthUse=i.subul[it.code];
+    await setDoc(`catalog/${id}`,d);idOf[it.code+'|'+vid]=id;if(!S.catalog.some(x=>x.id===id))S.catalog.push(d)}
+  await setWeek(i.weekId,w=>{const s=(w.sales||[]).slice();for(let b=0;b<7;b++)if(i.sales[b]!=null)s[b]=i.sales[b];w.sales=s;w.hol=w.hol||{};for(const v of i.vendors)if(v.hol)w.hol[v.id]=v.hol.slice()});
+  if(i.next.some(x=>x!=null)){const nid=addDays(i.weekId,7);await setWeek(nid,w=>{const s=(w.sales||[]).slice();i.next.forEach((v,b)=>{if(v!=null&&(s[b]==null||s[b]===''))s[b]=v});w.sales=s})}
+  for(const e of i.entries){const vid=vidOf(e.vn);const id=idOf[e.code+'|'+vid]||findItem(e.code,vid)?.id||e.code;
+    try{const cur=await S.db.doc(`weeks/${i.weekId}/items/${id}`).get();const c=cur.exists?JSON.parse(JSON.stringify(cur.data())):{};
+      c.stock=e.stock;c.conf=e.conf;if(e.arr.some(x=>x))c.arr=e.arr;await S.db.doc(`weeks/${i.weekId}/items/${id}`).set(c)}catch(err){writeFail(err)}}
+  const vids=new Set(i.vendors.map(v=>v.id));
+  for(const [w,m] of Object.entries(i.log)){for(const [code,s] of Object.entries(m)){
+      const cand=S.catalog.filter(x=>String(x.code||'').trim()===code&&vids.has(x.vendorId));if(cand.length!==1)continue;const id=cand[0].id;
+    try{const ref=S.db.doc(`weeks/${w}/items/${id}`);const cur=await ref.get();const c=cur.exists?JSON.parse(JSON.stringify(cur.data())):{};
+      if(!(c.stock&&c.stock[0]!=null)){c.stock=arrSet(c.stock,0,s);await ref.set(c)}}catch(err){writeFail(err)}}}
+  for(const [w,a] of Object.entries(i.actual)){const cur=S.weeks[w]||{};if(cur.actual==null)await setWeek(w,x=>{x.actual=a})}
+  S.imp=null;S.view=i.weekId;subEntries();render();toast('엑셀 내용을 앱에 반영했습니다');
+}
+async function exportXl(group){
+  if(!window.XLSX||!S.dl){toast('이 화면에서는 파일 받기를 쓸 수 없습니다');return}
+  const vs=Object.values(S.vendors).sort((a,b)=>(a.order??99)-(b.order??99)).filter(v=>vGroup(v)===group);
+  if(!vs.length){toast('업체가 없습니다');return}
+  const onse=vs.some(v=>v.id==='onse')&&vs.length===1;const vset=new Set(vs.map(v=>v.id));
+  const R=calc(S.view),items=activeItems().filter(it=>vset.has(it.vendorId)),W=S.weeks[S.view]||{},NW=S.weeks[addDays(S.view,7)]||{};
+  const fileName=onse?'온세 파일':`${group} 파일`;
+  const wb=XLSX.utils.book_new();
+  // 1) 오토발주
+  const A=[];const put=(r,c,v)=>{A[r]=A[r]||[];A[r][c]=v};const col=s=>XLSX.utils.decode_col(s);
+  put(0,0,`앱 → ${fileName} 오토발주 (주 시작일 ${S.view})`);
+  put(1,0,`붙여넣는 방법: 이 시트의 K9부터 AH까지 품목 줄을 복사 → ${fileName} 오토발주 시트 K9 선택 → 선택하여 붙여넣기 → "값" + "내용 있는 셀만 붙여넣기(빈 셀 무시)" 체크.`);
+  put(2,0,'먼저 A열 품목코드 순서가 엑셀 파일 오토발주 시트와 같은지 확인하세요. 다르면 품목 관리 순서를 맞춘 뒤 붙여넣으세요.');
+  put(7,0,'품목코드');put(7,1,'품목명');if(!onse)put(7,2,'업체');BLK.forEach((c,b)=>{put(7,col(c),`${DN[b]} 실재고`);put(7,col(CONFC[b]),`${DN[b]} 확정`)});
+  items.forEach((it,i)=>{const r=8+i;const o=R.out[it.id];put(r,0,Number(it.code)||it.code);put(r,1,it.name);if(!onse)put(r,2,(S.vendors[it.vendorId]||{}).name||'');
+    BLK.forEach((c,b)=>{if(o.stockIn[b+1]!=null)put(r,col(c),o.stockIn[b+1])});CONFC.forEach((c,b)=>{if(o.conf[b]!=null)put(r,col(c),o.conf[b])})});
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(A),'오토발주 붙여넣기');
+  // 2) 매출 입력
+  const nN=onse?2:7;const B=[];const putB=(r,c,v)=>{B[r]=B[r]||[];B[r][c]=v};
+  putB(0,1,`붙여넣는 방법: D4와 E7:E${13+nN}를 복사 → ${fileName} 매출 입력 시트 같은 칸에 "값"으로 붙여넣기`);
+  putB(3,1,'기준월 매출');putB(3,3,S.settings.monthSales??'');
+  for(let k=0;k<7+nN;k++){putB(6+k,1,k<7?'이번 주':'다음 주');putB(6+k,2,DN[k%7]);const v=k<7?(W.sales||[])[k]:(NW.sales||[])[k-7];putB(6+k,4,v??'')}
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(B),'매출 입력 붙여넣기');
+  // 3) 업체 휴무 (여러 업체 형식)
+  if(!onse){const H=[['붙여넣는 방법: M5부터 R열까지 복사 → 업체 설정 시트 M5에 "값"으로 붙여넣기 (업체 순서가 같은지 먼저 확인)'],[],[],['','업체','','','','','','','','','','','월','화','수','목','금','토']];
+    const r0=calc(S.view);vs.forEach(v=>{const it=items.find(x=>x.vendorId===v.id);const o=it?r0.out[it.id]:null;const row=['',v.name,'','','','','','','','','',''];
+      for(let b=0;b<6;b++)row.push(o&&o.hol[b]&&(v.sched||[])[b]!=null?'휴무':'');H.push(row)});
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(H),'업체 설정 붙여넣기')}
+  // 4) 주간 기록
+  const L=[[`붙여넣는 방법: 3행부터 복사 → ${fileName} 주간 기록 시트의 마지막 줄 아래(A열)에 "값"으로 붙여넣기`],['주 시작일','품목코드','품목명','월요일 재고','입고 합계','예상 사용량','발주 합계','실제 사용량','실제 매출 기준 예상','오차율','실제 100만원당']];
+  const weeks=Object.keys(S.entries).filter(w=>w<=S.view).sort();
+  for(const w of weeks){const r=calc(w);const nr=calc(addDays(w,7));const act=Number((S.weeks[w]||{}).actual)||0;
+    for(const it of items){const o=r.out[it.id];if(!o||!o.hasMon)continue;const no=nr.out[it.id];
+      const row=[w,Number(it.code)||it.code,it.name,o.stockIn[1],Math.round(o.weekArr*100)/100,Math.round(o.weekUse*10)/10,o.used.reduce((s,x)=>s+x,0)];
+      if(no&&no.hasMon&&act){const u=o.stockIn[1]+o.weekArr-no.stockIn[1];const ex=o.rate*act/1e6;row.push(Math.round(u*10)/10,Math.round(ex*10)/10,ex?Math.round((u-ex)/ex*100)/100:'',Math.round(u/act*1e6*1000)/1000)}
+      L.push(row)}}
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(L),'주간 기록 붙여넣기');
+  const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  try{await S.dl.save({filename:`앱_${String(group).replace(/[\\\/\?\*\[\]:]/g,'')}형식_${S.view}.xlsx`,data:new Uint8Array(buf)});toast('파일을 저장했습니다')}catch(e){if(e&&e.code==='declined')return;toast('파일을 저장하지 못했습니다')}
+}
+
+/* ---------- boot ---------- */
+render();
+(async()=>{
+  const db=window.claude?await window.claude.use('db'):null;
+  if(!db){$('#app').innerHTML='<div class="card"><div class="empty">저장소에 연결하지 못했습니다.</div></div>';return}
+  S.db=db;
+  window.claude.use('downloads').then(d=>{S.dl=d;if(S.tab==='set')schedule()});
+  window.claude.use('user').then(async u=>{S.user=u;if(u){const c=await u.can('data.write');if(c===false){S.canWrite=false;$('#who').textContent='보기 전용'}}});
+  db.doc('config/main').onSnapshot(s=>{S.settings=Object.assign({safety:1.2,monInc:true},s.exists?s.data():{});S.ready.cfg=true;schedule()},onErr);
+  db.collection('vendors').onSnapshot(s=>{const m={};s.docs.forEach(d=>m[d.id]=Object.assign({id:d.id},d.data()));S.vendors=m;S.ready.ven=true;schedule()},onErr);
+  db.collection('catalog').onSnapshot(s=>{S.catalog=s.docs.map(d=>Object.assign({},d.data(),{id:d.id}));S.ready.cat=true;schedule()},onErr);
+  db.collection('weeks').onSnapshot(s=>{const m={};s.docs.forEach(d=>m[d.id]=d.data());S.weeks=m;S.ready.wk=true;schedule()},onErr);
+  subEntries();
+})();
+</script>
+
+</body>
+</html>
