@@ -224,7 +224,8 @@ function vGrid() {
 /* ----- 발주 파일 올리기 ----- */
 function cellsOfHtml(text) {
   const doc = new DOMParser().parseFromString(text, 'text/html');
-  return [...doc.querySelectorAll('table')].map(t => [...t.querySelectorAll('tr')].map(tr => [...tr.children].map(td => td.textContent.trim())));
+  // 병합 칸(rowspan/colspan)을 펼쳐서 엑셀과 같은 칸 위치로 맞춤
+  return [...doc.querySelectorAll('table')].map(t => { const g = []; [...t.querySelectorAll('tr')].forEach((tr, ri) => { g[ri] = g[ri] || []; let ci = 0; for (const td of tr.children) { while (g[ri][ci] !== undefined) ci++; const v = td.textContent.replace(/\s+/g, ' ').trim(); const rs = Number(td.getAttribute('rowspan')) || 1, cs = Number(td.getAttribute('colspan')) || 1; for (let r = 0; r < rs; r++) { g[ri + r] = g[ri + r] || []; for (let c = 0; c < cs; c++) g[ri + r][ci + c] = v; } ci += cs; } }); return g.map(r => Array.from(r, x => x === undefined ? '' : x)); });
 }
 function cellsOfXlsx(buf) {
   const wb = XLSX.read(buf, { type: 'array' });
