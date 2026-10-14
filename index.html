@@ -749,8 +749,10 @@ function vSet(){
   if(S.q&&!shown)html+=`<div class="empty">"${esc(S.q)}" 검색 결과가 없습니다.</div>`;
   html+=`</section>`;
   {const evs=vs.filter(v=>activeItems().some(it=>it.vendorId===v.id));
-  html+=`<section class="card"><div class="hd"><span>발주표 엑셀로 받기</span><span class="sub">${md(S.view)}~${md(addDays(S.view,5))} 주</span></div><div class="vd"><p class="note">"내 발주"에 넣은 수량과 실제 발주 금액(수량 × 단가)이 요일별로 나옵니다. 다른 주는 화면 위 ‹ › 로 바꾼 뒤 받으세요.</p>
-    <button class="btn pri" data-export="*" ${S.dl?'':'disabled'}>전체 받기 (요약 + 업체별 시트)</button>
+  html+=`<section class="card"><div class="hd"><span>발주표 엑셀로 받기</span><span class="sub">${md(S.view)}~${md(addDays(S.view,5))} 주</span></div><div class="vd"><p class="note">예전에 쓰던 엑셀 발주표(FOH 시트)와 같은 모양으로 받습니다. FORECAST · ON HAND(입력한 재고) · ORDER(내 발주)가 채워지고, 마지막 시트에 업체별 발주 금액이 나옵니다. 다른 주는 화면 위 ‹ › 로 바꾼 뒤 받으세요.</p>
+    ${typeof formButtonsHtml==='function'?formButtonsHtml():''}
+    <div class="name" style="margin-top:16px">발주 금액 정리표 (간단 양식)</div>
+    <button class="btn" data-export="*" ${S.dl?'':'disabled'}>전체 받기 (요약 + 업체별 시트)</button>
     <div class="chips" style="flex-wrap:wrap;margin-top:10px">${evs.map(v=>`<button class="chip" data-export="${v.id}" ${S.dl?'':'disabled'}>${esc(v.name)}</button>`).join('')}</div></div></section>`;}
   {const gs=groupsList();
   html+=`<section class="card" id="onsex"><div class="hd"><span>오토발주 엑셀 파일과 주고받기</span></div>
@@ -1052,5 +1054,6 @@ render();
 })();
 </script>
 
+<script src="export2.js"></script>
 </body>
 </html>
