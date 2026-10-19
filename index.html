@@ -376,7 +376,7 @@ function computeWeek(ctx) {
       else if (minS !== null) rec[b] = P[b] <= minS ? ceilTo(Math.max(minQ || 1, 1), mult) : 0;
       else if (rate === 0) rec[b] = null;
       else rec[b] = ceilTo(Math.max(0, c * safety - P[b]), mult);
-      used[b] = hol[b] ? 0 : (conf[b] !== null ? conf[b] : (past[b] ? 0 : (typeof rec[b] === 'number' ? rec[b] : 0)));
+      used[b] = hol[b] ? 0 : (conf[b] !== null ? conf[b] : 0); // 입력한(확정된) 발주만 입고 예상에 더함
     }
     const open = [0], arrD = [0], close = [0], after = [0];
     for (let d = 1; d <= 14; d++) {
@@ -518,7 +518,7 @@ function vOrder(){
   if(!any) html+=`<div class="card"><div class="empty">${DN[b]}요일에 발주하는 업체가 없습니다.</div></div>`;
   else html+=`<div class="card sum"><span>추천 금액 <b>${won(totR)}</b></span><span>내 발주 금액 <b>${won(totC)}</b></span></div>`;
   if(skipped.length) html=html.slice(0,skipAt)+`<div class="card"><div class="meta" style="padding:10px 14px;font-size:calc(13px*var(--fz,1))"><span class="sub">${DN[b]}요일 발주 없음</span>${skipped.join('')}</div></div>`+html.slice(skipAt);
-  html+=`<p class="note">"내 발주"에는 실제로 발주할 수량을 넣으세요(− + 버튼은 발주 단위만큼 움직입니다). 비워두면 추천 수량대로 발주한다고 보고 계산하고, 날짜가 지난 발주일에 비어 있으면 0(발주 안 함)으로 계산합니다.</p>`;
+  html+=`<p class="note">"내 발주"에는 실제로 발주할 수량을 넣으세요(− + 버튼은 발주 단위만큼 움직입니다). 비워두면 아직 발주하지 않은 것으로 보고, 뒤 요일의 입고 전(예상) 재고에 더하지 않습니다. 발주했으면 꼭 수량을 넣어 주세요.</p>`;
   return html;
 }
 /* 재고 */

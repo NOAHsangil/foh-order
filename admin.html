@@ -346,7 +346,7 @@ function computeWeek(ctx) {
       else if (minS !== null) rec[b] = P[b] <= minS ? ceilTo(Math.max(minQ || 1, 1), mult) : 0;
       else if (rate === 0) rec[b] = null;
       else rec[b] = ceilTo(Math.max(0, c * safety - P[b]), mult);
-      used[b] = hol[b] ? 0 : (conf[b] !== null ? conf[b] : (past[b] ? 0 : (typeof rec[b] === 'number' ? rec[b] : 0)));
+      used[b] = hol[b] ? 0 : (conf[b] !== null ? conf[b] : 0); // 입력한(확정된) 발주만 입고 예상에 더함
     }
     const open = [0], arrD = [0], close = [0], after = [0];
     for (let d = 1; d <= 14; d++) {
